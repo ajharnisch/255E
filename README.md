@@ -8,4 +8,10 @@ Fall 2017 BIOL 255E class materials.
 chnage here
 here is my testing branch change
 
-causing a conflict. 
+
+here is my testing branch change
+
+here are my server changes to this file. 
+
+second attempt 
+>>>>>>> testing
