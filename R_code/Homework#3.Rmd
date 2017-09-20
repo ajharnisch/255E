@@ -1,0 +1,13 @@
+---
+title: Comparison of San Jose State University Equiptment Technician (I,II,III), Electronic
+  Salary
+author: "Arthur Harnisch"
+date: "September 20, 2017"
+output: HTML
+---
+
+library(datasets)
+data(subs)
+summary(subs)
+
+
