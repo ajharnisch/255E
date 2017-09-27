@@ -1,0 +1,81 @@
+---
+title: "Untitled"
+author: "Arthur Harnisch"
+date: "September 27, 2017"
+output: html_document
+---
+
+#automating data analysis. writing your own functions in R. writing your own function 
+# function name (argument = df true/false) when you write your own function you will be putting in your own arguments in .
+# using the function function 
+
+#the variable my function 
+
+#function function ```{r functionExample}
+#my function 
+# curly brace defines start and end of funciton, additin line first multiplication line first 
+
+```{r functionExample}
+myfunction <- function (x){
+  print(x)
+}
+
+```{r functionExample2}
+myfunction (x=2)
+myFunction (x= c(1,2,3,4)}
+
+```{r functionExample 3)
+myfunction2 <- function (x,y) {
+  z= x+y
+  z
+}
+
+
+
+
+
+```{r seFunction}
+mySE <- function (x){
+  #assumes the input x is a vector of numbers
+  # first calculate the variance
+  myvar = var(x)
+  #then calculate the number of values
+  myn = length(x)
+  #next calculate the square root of the variance divided by sample size
+  mySE = sqrt(myvar/myn)
+  #hte value returned will be the last object created in the function, in this case mySE
+  mySE #repeating just the last variable here will cause the result to print out when run
+}
+```
+
+Now we can test that function
+```{r testSE}
+
+x=c(1,1,3,3,6,6)
+mySE(x) #result should be 0.918..
+```
+
+
+avoid copy and paste. 
+there are functions in R that will sometimes only take the name of another function as an argument. One example we've function. mecause we have created a function. there are 
+
+in your analysis if you have multiple funnctions in the analysis you can stick in .rmd and source the .r script file of the function. 
+
+```{r aggregateCustomFunction}
+#make a practice data frame # note rep function means repeat. # this is a quick 
+mydf = data.frame(group = c(rep(`A,`6) rep(`8,`6)),
+                  values c (1,2,3,4,5,6)
+mydf
+
+mySE(mydf$Values[7:12])
+
+
+aggregate(Values~group, data = mydf, FUN = mySE)
+
+
+we now use our custom mySE function inside aggregate() to accomplish the same thing. 
+
+```
+
+hw you will create two functions download data and plot data and will do this several times
+
