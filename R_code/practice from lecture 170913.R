@@ -11,7 +11,7 @@ salsub = sal[sal$job.title %in% job sub]
 salsub =droplevel(salsub) # get rid of unused factor levels
 
 # by defalt ordered data, rearrange data use the factor funciton, factor and level function will rearrange the order. 
-
+#
 
 #salsub$jobtilte=factor(salsub$job.title, levels = c('Payroll technician', name the levels). )
 
