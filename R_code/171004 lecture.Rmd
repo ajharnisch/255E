@@ -13,8 +13,11 @@ knitr::opts_chunk$set(echo = TRUE)
 test1 = "the current year is 2016"
 
 
+
+
+
 my_pattern ="[0-9]"
-my_pattern = "[zxqy]" # note ther is a y so this would return true. 
+"[0-9]" = my_pattern = "[zxqy]" # note ther is a y so this would return true. 
 grepl(pattern = my_pattern, test1) # tell us that ther is a numeric digit in the test1
 
 

@@ -1,0 +1,46 @@
+---
+title: "Homework Week 7"
+author: "Arthur Harnisch"
+date: "October 6, 2017"
+output: word_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+Importing data
+
+```{r importing data}
+
+df = read.csv('../data/california-state-university-2015.csv')
+
+csu = df$Employee.Name = as.character(df$Employee.Name)
+```
+
+
+Find all entries with the name "Martinez"
+
+```{r finding Martinez}
+
+grep("Martinez", df$Employee.Name, value = TRUE)
+
+
+```
+Everyone whose name starts with the letters "Wil"
+```{r finding Wil}
+
+regexpr("Wil", df$Employee.Name)
+
+
+
+
+
+```
+
+
+, Everyone with a hyphenated name, Everyone whose middle name is paul, all people with the last name martinez, all people with last name martinez but no hyphens or Jr., first name starts with E has a middle initial and last name is martinez, and first name starts with E has no middle initial and last name is martinez. 
+
+
+
+
