@@ -18,10 +18,7 @@ myfunction (x=2)
 myFunction (x= c(1,2,3,4)}
 
 ```{r functionExample 3)
-myfunction2 <- function (x,y) {
-  z= x+y
-  z
-}
+
 
 # the point of functions in r is that it prevents you from having to write a chunk of code multiple times. pacakge them in a code, leading to more concise set of code. 
 #you can use this by naming the function and then be able to run that function. 
@@ -75,3 +72,7 @@ source("../R_code/week6_functions.R")
 #use plot
 
 plot(X = res$TimeTC, y= res$TidXT, type = 'l') #l is line graph B would be box
+
+#in the markdown you will need to write chunks and three different months and then make three plots for each daat set. 
+
+

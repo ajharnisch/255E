@@ -79,3 +79,6 @@ we now use our custom mySE function inside aggregate() to accomplish the same th
 
 hw you will create two functions download data and plot data and will do this several times
 
+note there is a link to github page
+
+you could copy all of this could be HW week 6 file

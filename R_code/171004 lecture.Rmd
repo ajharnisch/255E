@@ -1,0 +1,134 @@
+---
+title: "week 7 scratch"
+author: "Arthur Harnisch"
+date: "October 4, 2017"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r test1}
+test1 = "the current year is 2016"
+
+
+my_pattern ="[0-9]"
+my_pattern = "[zxqy]" # note ther is a y so this would return true. 
+grepl(pattern = my_pattern, test1) # tell us that ther is a numeric digit in the test1
+
+
+
+my_pattern = "[zxqb]"
+
+gregexpr(patern = my_pattern, test1)
+
+output = gregexpr(my_pattern, test1) # variable of list 1. 
+ #lsit has generic 
+
+
+output[[1]]
+#attr - is attribute, 
+
+temp = gregexpr(my_pattern. test1)
+string_position = temp[[1]
+                       
+substr(test1,string_position[1],string_position[length(string_position)])                       
+
+
+#balnk positions do ahve positions for example
+
+gregexpr("[[:blank:]]", test1) # tis can indicate the locations of the blanks. #note the square brackets indicate everything included, 
+                       
+test1 = "the current year is 2016"
+
+# ex 3 
+grepl(pattern = "[[:upper:][:digit:]]", test1) # if er:][:digit:]] ",this would also be stating to look for a space. 
+
+
+temp = regexpr(pattern = "[[:blank:]]", test1)
+#used to returnt the first location of a match. 
+#g - returns every occurance 
+gregexpr(pattern = "[[:blank:]]", test1)
+
+
+loc = temp[[1]][1]# this is the first entry in the first slot. 
+loc # L is to represent a long integer. 
+
+first_space = temp[[1][1] # look for any single character in a string. 
+   my_pattern = "[[:lower:]].[[:digit:]]"
+
+
+                   
+ grepl(my_pattern, test1)
+
+
+ loc = gregexpr(my_pattern, test1)[[1]][1] #first slot first entry
+  
+loc = temp[[1]][1]
+
+# [[]] used to get things out of the expression   
+
+ 
+my_pattern = "\\s[[lower:]]{2}\\s" # is supposed to return the second one twice. the value can be matched n number of timer. 
+gregexpr(my_pattern, test1)
+loc = gregexpr(my_pattern, test1)[[1]][1]
+
+#if we wat to replace with not
+# sub is pattern replacemtn 
+
+text 2= sub(my_pattern, replacement = " is not ", test1) #{n,m} - you can use this to define the word length. or 
+#{ ,m}
+
+
+my_pattern = "\\d{4}"
+temp = gregexpr(my_pattern, text2)
+
+
+#string_pos4 = substr(text2, start = temp [[1]][1], stop= temp[[1]][1] + attr(temp[[1]], 'match length'))
+
+
+#stop= nchar(text2)
+
+
+as.numeric(string_pos4)
+
+
+
+#exercise 10
+
+string_pos4 = temp[[1]][1]
+
+
+substr(text2, start = string_pos4, stop = string_pos4 +1)
+
+# read.csv want to be character sringgs so use as.character 
+
+
+#cashing - so you will not have to reload the document 
+
+
+# the HW there will be varying patterns of matches
+
+
+
+
+
+df read.csv
+
+(df$emplyee.name[grepl(pattern = "", df$employee,name)])
+
+#char (0) means did not have any responses. 
+
+
+my_pattern =""
+
+df$employee.name[grepl](pattern = my_pattern, 
+                        df$Employee.name)] 
+
+
+
+
+#grepl - give a printout of the employee names that match some search term. 
+
+```

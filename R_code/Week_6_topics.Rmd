@@ -1,0 +1,115 @@
+---
+title: "Week 6 topic"
+author: "Luke Miller"
+date: "September 26, 2017"
+output: word_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, fig.align = 'center')
+```
+
+## R functions
+
+* We've been exposed to *using* R functions already.
+* Next we ought to learn how to write our own functions to help automate data analysis tasks.
+* R functions are created with the `function` function. 
+
+```{r functionExample1}
+myFunction <- function(x){
+  print(x)
+}
+```
+The above code creates a new function `myFunction`. It takes a single argument `x`, and when the function executes, it will print out the contents of `x` to the console (or output document).
+
+```{r functionExample2}
+myFunction(x = 2)
+
+myFunction(x = c(1,2,3,4))
+```
+
+This basic function is fairly useless, since it recreates the existing `print()` function. Normally you would insert more code in the curly braces to do operations. 
+
+* R functions generally return the last object used in the function. So if you wanted your function to add two numbers and return the result, you'd want the result object to the last line in the function.
+
+```{r functionExample3}
+myFunction2 <- function(x, y){
+  z = x + y
+  z
+}
+
+result = myFunction2(2,4)
+print(result)
+```
+
+Note that in the code above, we run the function and assign the results to a new variable called `result`. To actually show what was calculated, we have to print out `result`. If we ran the function without assigning its results to a variable, it would just print out 
+the contents of `z` to the console. 
+
+```{r functionExample4}
+myFunction2(4,6)
+```
+
+
+Let's make a more complicated and perhaps useful function. We'll create a function to calculate the standard error of a set of data values. To calculate SE, we first need to know the variance of the data values, and the number of values, and then we calculate SE as:
+
+$SE = \sqrt{\frac{variance}{n}}$
+
+```{r seFunction}
+# mySE <- function(x){
+#   # Assume the input x is a vector of numbers
+#   # First calculate the variance
+#   myvar = var(x)
+#   # Then calculate the number of values in the sample
+#   myn = length(x)
+#   # Next calculate the square root of the variance divide by sample size
+#   mySE = sqrt( myvar / myn )
+#   # The value returned will be the last object created in the function, in this case mySE
+#   mySE  # Repeating just the last variable here will cause the result to print out when run
+# }
+
+source("../R_code/Week6_functions.R")
+
+
+```
+
+Now we can test the function:
+```{r testSE}
+x = c(1,1,3,3,6,6)
+mySE(x)  # Result should be 0.9189366
+
+```
+
+Now that you have the basics of creating a function down, let's explore how and when you might use them.
+
+* A function is useful whenever you foresee repeating the same several lines of code over and over inside your `.Rmd` document or `.R` script. If you put the several lines of code inside a function, you only need to use the new function in the future, and give it the appropriate new data (as arguments) each time you use it.
+
+* A function is useful if you want to 'hide' some complicated code from other users, so that they only have to type the name of your function, and give it the appropriate arguments.
+
+* There are functions in R that will sometimes only take the name of another function as an argument. One example we've used is the `aggregate` function, which we used to calculate means or standard deviations of different groups in a data frame. If you write your own 
+custom function, you can supply it to `aggregate` as an argument and have it carry out your custom function on each group. 
+
+```{r aggregateCustomFunction}
+# Make a practice data frame
+mydf = data.frame(Group = c(rep('A',6),rep('B',6)), 
+                  Values = c(1,2,3,4,5,6,11,22,33,44,55,66))
+mydf # Print it out
+# Calculate the SE of group A (rows 1-6)
+mySE(mydf$Values[1:6])
+# Calculate the SE of group B (rows 7-12)
+mySE(mydf$Values[7:12])
+
+# Now use our custom mySE function inside aggregate() to accomplish the same thing
+aggregate(Values~Group, data = mydf, FUN = mySE)
+
+```
+
+
+
+
+## Homework: Creating a function out of a chunk of someone else's code
+
+If you go to https://github.com/millerlp/Misc_R_scripts/blob/master/NOAA_tide_ht_retrieval.R you will find an R script that would normally be sourced and run all at once. It prompts the user to enter a NOAA tide station identifier code, and a start and end date, so that it can contact the NOAA server and retrieve tide height data. 
+
+Currently that code requires the user to answer 3 prompts every time they want to use the code to download one month of data. What if you wanted to insert this code into a .Rmd 
+markdown document and have it automatically execute with a pre-selected tide station and date range? What I would suggest is removing some of the code that prompts the user for their input, and instead encapsulate the rest of the code in a function that will take 3 arguments: station ID number, start date, and end date. 
+
