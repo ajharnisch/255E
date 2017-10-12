@@ -1,7 +1,7 @@
 ---
 title: "Homework Week 7"
 author: "Arthur Harnisch"
-date: "October 6, 2017"
+date: "October 11, 2017"
 output: word_document
 ---
 
@@ -23,23 +23,112 @@ Find all entries with the name "Martinez"
 
 ```{r finding Martinez}
 
-grep("Martinez", df$Employee.Name, value = TRUE)
+#finding the number of people with Martinez in their name
+length(grep("Martinez", df$Employee.Name, value = TRUE))
+
+#listing the names that contain Martinez 
+head(grep("Martinez", df$Employee.Name, value = TRUE))
 
 
 ```
 Everyone whose name starts with the letters "Wil"
 ```{r finding Wil}
 
-regexpr("Wil", df$Employee.Name)
+#finding the number of entries that begin with "Wil"
+length(grep("^Wil", df$Employee.Name, value = TRUE))
 
 
-
+#listing the individuals with name that begins with "Wil"
+head(grep("^Wil", df$Employee.Name, value = TRUE))
 
 
 ```
 
 
-, Everyone with a hyphenated name, Everyone whose middle name is paul, all people with the last name martinez, all people with last name martinez but no hyphens or Jr., first name starts with E has a middle initial and last name is martinez, and first name starts with E has no middle initial and last name is martinez. 
+Everyone with a hyphenated name
+
+```{r finding hyphens}
+
+#finding the number of people with hyphenated names
+length(grep("-", df$Employee.Name, value = TRUE))
+
+#listing the individual's with hyphenated names
+
+head(grep("-", df$Employee.Name, value = TRUE))
+
+```
+
+
+Everyone whose middle name is paul
+
+``` {r middleName}
+
+
+# the majority of names on this list have an initial for the middle name for example
+
+length(grep("\\sP\\s", df$Employee.Name, value = TRUE))
+head(grep("\\sP\\s", df$Employee.Name, value = TRUE)) # this returns middle name begining with P
+
+
+# However some people do have Paul as a middle name on this list though
+
+length(grep("\\sPaul\\s", df$Employee.Name, value = TRUE))
+
+head(grep("\\sPaul\\s", df$Employee.Name, value = TRUE))
+
+```
+
+
+All people with the last name Martinez
+
+```{r lastNames}
+
+length(grep("Martinez$", df$Employee.Name, value = TRUE))
+
+head(grep("Martinez$", df$Employee.Name, value = TRUE))
+
+```
+
+All people with last name martinez but no hyphens or Jr.
+
+```{r martinezAndnonMatching}
+
+
+length(grep("(Martinez$)(?!-\\[jJ]r.)", df$Employee.Name, value = TRUE, perl = TRUE))
+
+
+head(grep("(Martinez$)(?!-\\[jJ]r.)", df$Employee.Name, value = TRUE, perl = TRUE))
+
+
+```
+
+ All people with first name that starts with E has a middle initial and last name is Martinez
+
+```{r specificMartinez}
+
+#one way to do this is by using data frames 
+
+eName=grep("^E", df$Employee.Name, value = TRUE)
+mArtinez = grep("Martinez$", eName, value = TRUE)
+length(grep("\\s.\\s", mArtinez, value = TRUE))
+head(grep("\\s.\\s", mArtinez, value = TRUE))
+
+
+
+#alternatevely this can also be accomplished by using 
+
+length(grep("(^E)(.*\\s.\\s)(.*?Martinez$)", df$Employee.Name, perl = TRUE, value = TRUE))
+grep("(^E)(.*\\s.\\s)(.*?Martinez$)", df$Employee.Name, perl = TRUE, value = TRUE)
+
+
+```
+First name starts with E has no middle initial and last name is martinez. 
+```{r nonMiddle}
+
+grep("(^E)(?!.*\\s.\\s)(.*?Martinez$)", df$Employee.Name, value = TRUE, perl = TRUE)
+
+
+```
 
 
 
