@@ -1,0 +1,11 @@
+---
+title: "Homework 8"
+author: "Arthur Harnisch"
+date: "October 15, 2017"
+output: word_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
