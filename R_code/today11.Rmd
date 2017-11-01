@@ -1,0 +1,178 @@
+---
+title: "week 10"
+author: "Arthur Harnisch"
+date: "November 1, 2017"
+output: word_document:
+fig_caption: true
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE), #fig.path = 'figs/', cache = TRUE # save copies of ifgures into folders
+
+```
+
+
+files get saved when knitting the whole document 
+
+```{r pressurData, echo=TRUE}
+
+summary(pressure)
+pressure = pressure
+
+```
+
+
+adding dpi = 300 will increase the file dimensions
+
+
+```{r pressure2, dpi = 300}
+
+plot(pressure, col = 'blue')
+```
+
+
+```{r pressure3, dpi= 300, figwidth = 4, fig.height=7}
+
+plot(pressure, col = red)
+```
+
+dev= c('png','pdf') c argument fits them together
+
+
+saving figures
+functions to save the fiel type. 
+
+?png
+
+
+```{r basicplorScript.eval = FALSE, echo= TRUE}
+
+#dev.off #many lines of plotting codes will show up in image file but thi command is not necessary. 
+
+```
+
+1024/768 projectors
+
+1920/1080 - projector screen across lab
+
+
+
+
+###ggplot2 
+
+
+```{r bacisSetup, echo=TRUE}
+
+library(ggplot2)
+diamonds = diamonds
+
+
+```
+
+
+```{rlayoutBasicPlot, fig.hsow='hide',echo=TRUE}
+
+ggplot(diamonds)
+ggplot(diamonds, aes(x=carat, y=price))
+
+ggplot(diamonds, aes(x=carat, y=price))
+```
+
+```{r catatvscost, echo=TRUE, dpi=300}
+
+ggplot(diamonds, aes(x=carat, y=price)) +
+  geom_point()
+```
+
+
+```{redivdeByCUt, ECHO=TRUE, dpi=300}
+#makes asthetic arguments 
+ggplot(diamonds, aes(x=carat, y=price, color = cut)) +
+geom_point()
+```
+
+```{rsmoothers, echo=TRUE, dpi= 300}
+ggplot(diamonds, aes(x=carat, y=price)) + geom_point(aes(color=cut)) + geom_smooth()
+
+
+```{r singleSmooth, echo=TRUE, dpi=300}
+
+ggplot(diamonds, aes(x=carat, y=price)) +
+geom_point()+geom_smooth()
+
+```
+
+
+
+
+```{r shape}
+
+ggplot(diamonds, aes(x=carat, y=price, color = cut, shape = color)) +
+geom_point()
+```
+
+
+```{r ModColor, fig.cap='Transparency added'}
+
+ggplot(diamonds, aes(x=carat, y=price, color= cut)) + geom_point()+ labs(title = "scatterplot", x = "Carat", y = "price")
+```
+
+
+```{r ST}
+
+gg<-ggplot(diamonds, aes(x=carat, y=price, color= cut)) + geom_point()
+
+
+gg= labs(title = "scatterplot", x = "Carat", y = "price")
+
+print(gg)
+
+
+```
+
+
+
+
+
+```{r stuff}
+
+gg1 = gg +theme(plot.title=element_text(size=30, face = "bold"), 
+axis.text.x = element_text(size = 18), 
+axis.text.y = element_text(sizex=18), 
+axis.title.x=elements_text(size=25), 
+axis.title.y=element_text(size = 25)))
+```
+
+```{r facet1, echo=true, dpi =300}
+gg+facet_wrap( ~ cut, ncol = 3) 
+
+# allows for multiple plots for one group 
+```
+
+```{r barchart1, echo=TRUE, dpi=300}
+
+mtcars= mtcars
+ggplot(mtcars, aes(x=cyl)) + geom_bar() + labs(title = 'Frequency bar chart')
+
+```
+
+
+```{r boxplot}
+ggplot(mtcars, aes(x=factor(cyl), y=hp)) + stat_boxplot()
+
+```
+
+
+
+```{r volinplot}
+
+ggplot(mtcars, aes(x=factor(cyl), y=hp)) + geom_violin()
+
+```
+
+```{r boxplot}
+
+ggplot(mtcars, aes(x=factor(cyl), y=hp)) +geom_jitter(width = 0.1, height = 0, aes(color = factor(cyl)))
+
+```
+```
