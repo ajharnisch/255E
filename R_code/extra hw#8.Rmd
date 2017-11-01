@@ -1,0 +1,153 @@
+---
+title: "extra from HW 8"
+author: "Arthur Harnisch"
+date: "October 25, 2017"
+output: word_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+
+setwd("C:\\Users\\Arthur\\255E")
+```
+
+```{r extra}
+
+
+
+```{r secondPlot}
+heatingInfo = read.xlsx("../data/Heating_trial_info.xlsx", sheetIndex = 1)
+heating1 = heatingInfo
+
+sub1 = subset(heatingInfo, heatingInfo$TCLocation == "In50")
+
+levels(sub1$TCchannel) <- sub('Ch', 'TC', levels(sub1$TCchannel))
+
+
+
+if (heatingInfo$TCLocation[x] == "In50"){
+  chloc = regexpr(pattern = "[[:digit:]]", hearingInfo$TCchannel[x])
+  chNum = substr(heatingInfo$TCchannel[x], 
+                  start = chloc[[1]][1], stop = chloc[[1]][1])
+     chName = paste("TC", chNum, sep = "")
+   trailNumber = heatingInfo$TrialNumber[x]
+   
+   temps = res[ res$trialNumber == trailNumber , chName]
+   
+  times= res$elapsedTimeMin[res$trialNumbe == trialNumber]
+  
+}
+
+
+
+
+ for(x in 1:nrow(i)){
+  
+ if  (heatingInfo$TCLocation[x] == "In50") {
+   chloc = regexpr(pattern = "[[:digit:]]", 
+                   heatingInfo$TCchannel[x]) 
+   chNum = substr(heatingInfo$TCchannel[x], 
+                  start = chloc[[1]][1], stop = chloc[[1]][1])
+   chName = paste("TC", chNum, sep = "")
+   trailNumber = heatingInfo$TrialNumber[x]
+   
+   temps = res[ res$trialNumber == trailNumber , chName]
+   
+  times= res$elapsedTimeMin[res$trialNumbe == trialNumber]
+
+   
+  print(x)
+
+
+
+
+
+
+#TC0~elapsedTime
+#data = res[res$trialNumber ==1
+#ploting trial 1 use plot command then lines command 
+
+firstTrial =1
+plot(x=temps[res$TrialNumber ==1], y= res$TC0[res$TrialNumber == firstTrial],
+      
+     type = 'l', 
+     xlab = 'Elapsed time, Minutes',
+     ylab = 'temperature C', las = 1,
+xlim  = c(0,max(res$elapsedTime)),
+ylim = c(min(res$TC0), max(res$TC0)))
+
+mtext(text = "A", side = 3, line =1.4, cex =  1.5, 
+adj = 0)
+
+# elapsedTime)),
+
+
+trialNums = unique(res$TrialNumber)
+
+for(y in 2:length(trialNums) ){
+  lines(x = res$elapsedTimeMin[res$TrialNumber == trialNums[y]],
+  y=res$TC0[res$TrialNumber == trialNums[y]], col = y)
+}
+
+
+
+
+```
+#plot(TC0~elapsedTimeMin, data = res, type = 'l')
+
+
+
+
+
+
+
+
+
+plot(res3$TC0,res3$DateTime, type = "n")
+
+points(res3$TC0, res3$DateTime, type = "p", pch=3 )
+
+for(i in unique(res3$)) {
+lines(res3[subj==i],time[subj==i],type="l",lty=2)
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+for(i in unique(subj)) {
+
+lines(trial[subj==i],time[subj==i],type="l",lty=2) 
+
+
+}
+
+
+
+
+
+
+```
+
+
+res$DateTime = as.POSIXct(res$DateTime, origin = '1970-1-1', tz="")
+
+
+
+fnames = dir("./data/temperature_trials", 
+             pattern = "*.csv", full.names = TRUE)
+
+temp = list.files(pattern="*.csv")
+myfiles = lapply(temp, read.delim)
+
+
+```

@@ -1,0 +1,24 @@
+---
+title: "Portfolio_Outline"
+author: "Arthur Harnisch"
+date: "October 31, 2017"
+output: word_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+Outline of Muscle Tension Analysis
+
+1.  
+
+
+
+
+```{r dataImport}
+###multiple data import 
+
+
+
+```
