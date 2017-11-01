@@ -9,16 +9,227 @@ output: word_document
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
-Outline of Muscle Tension Analysis
+Outline of R Code Function for Muscle Tension Analysis and Graphs
 
-1.  
+1. Produces a combination line plot (10 sec. before static stretch (baseline tension), peak tension, average tension 3.25-3.27 of 4 sec. static stretch, and minimum tension) that shows the percent variation from baseline (first 20 minutes of experiment) over time of the experiemnt and contains a legend for the date of each trial.
+
+2. Produces a plot of averages compared to time of experiment for multiple trials for average tension 3.25-3.75 of 4 sec. static stretch with error bars. 
+
+3. Produces two dot plots with mean error bars that compares percent variation from baseline (first 20 minutes of experiemnt) to average value for each 20 minutes of the experiment for both treatment and control trials. 
+
+4. Produces a line plot of peak tension as a percent variation from baseline tension over time of experiment. This graph also incudes a picture of the instentaneous firing frequency caused by the third static stretch from each 20 mintue period above thee title of the graph. The x-axis is a categorial variable that lists the interval for the 4 seconds of the static stretch and also lists the standard deviation at each 20 minute interval.  
+
+5. outputs a table for 10 sec. before static stretch (baseline tension), peak tension, average tension 3.25-3.27 of 4 sec. static stretch, and minimum tension in an excel (xlsx) format of transposed values with calculated average for each of the 20 minute periods.    
+
+note: 
+Input files for this code will be .csv files. 
+
+Experiments are conducted as a repeated measure design. Treatment and control experiments were conducted as seperate trials. Trials typically occur for 100 mintues. 
+
+Required packages: ggplot2. 
 
 
 
+###Installing Packages
+```{r packageInstall}
+# Packages necessary for this r code
 
-```{r dataImport}
-###multiple data import 
+#ggplot2
 
+#install.packages("ggplot2") #this command is commented out untill it becomes necessary to use. 
 
 
 ```
+###Importing data
+
+A folder named Tension_R was created so that multiple .csv files could be placed into it and analyzed. In this folder there are two folders, Experiment and Control. .csv files from a drug trial are placed under experiment and control files are placed under control.   
+
+```{r dataImport}
+
+#multiple data import for control using forloop to find .csv files and rbind
+
+myfiles=dir("../Tension_R/Control", pattern = "*.csv$", all.files = TRUE, full.names = TRUE)
+
+
+# commented out section, for loop needs modification 
+
+
+#for(i in 1: length(myfiles) ){
+  
+  #open each file
+ # read.csv(myfiles[i])
+ # temp = read.csv(myfiles[i])
+ 
+  #temp$DateTime = as.POSIXct(temp$DateTime, origin = '1970-1-1', tz="")
+  
+# temp$elapsedTime = difftime(temp$DateTime, temp$DateTime[1], units = 'mins') 
+ 
+#  temp$elapsedTimeMin = as.numeric(temp$elapsedTime)
+
+  
+ #   loc = (regexpr(pattern ="Trial[0-16]*", text = myfiles [i]))
+
+
+# trialNumber = as.numeric(substr(myfiles[i], start = loc[[1]][1]+5, 
+     # stop = loc[[1]][1] + attr(loc, 'match.length')-1))
+  
+# temp$TrialNumber =trialNumber
+  
+ #   if ( i == 1){
+# res = temp
+ # } else {
+#  res = rbind( res, temp)
+#}
+#}
+
+#res$DateTime = as.POSIXct(res$DateTime, origin = '1970-1-1', tz="")
+
+#res$POSIXt = as.POSIXct(res$POSIXt, origin = '1970-1-1', tz='')
+
+
+
+
+#multiple data import for experiment by use of for loop to find .csv files and rbind. 
+
+myfiles=dir("../Tension_R/Experiment", pattern = "*.csv$", all.files = TRUE, full.names = TRUE)
+
+
+# commented out section, for loop needs modification 
+
+
+#for(i in 1: length(myfiles) ){
+  
+  #open each file
+ # read.csv(myfiles[i])
+ # temp = read.csv(myfiles[i])
+ 
+  #temp$DateTime = as.POSIXct(temp$DateTime, origin = '1970-1-1', tz="")
+  
+# temp$elapsedTime = difftime(temp$DateTime, temp$DateTime[1], units = 'mins') 
+ 
+#  temp$elapsedTimeMin = as.numeric(temp$elapsedTime)
+
+  
+ #   loc = (regexpr(pattern ="Trial[0-16]*", text = myfiles [i]))
+
+
+# trialNumber = as.numeric(substr(myfiles[i], start = loc[[1]][1]+5, 
+     # stop = loc[[1]][1] + attr(loc, 'match.length')-1))
+  
+# temp$TrialNumber =trialNumber
+  
+ #   if ( i == 1){
+# res = temp
+ # } else {
+#  res = rbind( res, temp)
+#}
+#}
+
+#res$DateTime = as.POSIXct(res$DateTime, origin = '1970-1-1', tz="")
+
+#res$POSIXt = as.POSIXct(res$POSIXt, origin = '1970-1-1', tz='')
+
+
+
+#alternative to importing multiple files 
+
+myfiles=dir("../Tension_R/Control", pattern = "*.csv$", all.files = TRUE, full.names = TRUE)
+
+Experiemnt <- list.files(pattern = "*.csv$")
+
+my.data <- lapply(my.files, 
+                  read.csv, 
+                  header=TRUE, sep="\t", skip = 40)
+
+```
+###Data manipulation 
+
+This code finds the percent variation from baseline for 10 sec. before static stretch (baseline tension), peak tension, average tension 3.25-3.27 of 4 sec. static stretch, and minimum tension
+
+```{r dataManipulation}
+
+#calculates the percept variation from baseline for each of the trials and makes a seperate column to display the percent from variation 10 sec. before static stretch (baseline tension), peak tension, average tension 3.25-3.27 of 4 sec. static stretch, and minimum tension. 
+
+#for loop to perform calculation
+
+
+
+``` 
+###Combination line plot
+
+ Produces a combination line plot (10 sec. before static stretch (baseline tension), peak tension, average tension 3.25-3.27 of 4 sec. static stretch, and minimum tension) that shows the percent variation from baseline (first 20 minutes of experiment) over time of the experiemnt and contains a legend for the date of each trial.
+
+```{r combinationLineplot}
+
+#commented out needs modification
+#This was an example of multimple line plot from week 8 homework
+
+#TC0~elapsedTime
+#data = res[res$trialNumber ==1
+#ploting trial 1 use plot command then lines command 
+
+#firstTrial =1
+#plot(x=res$elapsedTimeMin[res$TrialNumber ==1], y= res$TC0[res$TrialNumber == firstTrial],
+      
+    # type = 'l', 
+     #xlab = 'Elapsed time, Minutes',
+    # ylab = 'temperature C', las = 1,
+#xlim  = c(0,max(res$elapsedTime)),
+#ylim = c(min(res$TC0), max(res$TC0)))
+
+#mtext(text = "Channel TC0 for each Trial", side = 3, line =1.4, cex =  1.5, 
+#adj = 0)
+
+# elapsedTime)),
+
+
+#trialNums = unique(res$TrialNumber)
+
+#for(y in 2:length(trialNums) ){
+  #lines(x = res$elapsedTimeMin[res$TrialNumber == trialNums[y]],
+ ## y=res$TC0[res$TrialNumber == trialNums[y]], col = y)
+#}
+
+
+```
+###Plot of averages
+
+Produces a plot of averages compared to time of experiment for multiple trials for average tension 3.25-3.75 of 4 sec. static stretch with error bars. 
+
+```{r plotAverages}
+
+#tell r to load ggplot 2 package
+#library(ggplot2) #commented out until functional
+
+#plot of averages
+#commented out until functional
+
+#ggplot(WordTypes, aes(x = Time, y = WordTypes, colour = SES)) + geom_line(aes(group = SES)) + 
+   # geom_point() + geom_errorbar(limits, width = 0.25)
+
+```
+###Dot plots with mean and error bars
+
+Produces two dot plots with mean error bars that compares percent variation from baseline (first 20 minutes of experiemnt) to average value for each 20 minutes of the experiment for both treatment and control trials. 
+
+```{r dotPlot}
+
+
+```
+###Line plot with data visulization and standard deviation
+
+Produces a line plot of peak tension as a percent variation from baseline tension over time of experiment. This graph also incudes a picture of the instentaneous firing frequency caused by the third static stretch from each 20 mintue period above thee title of the graph. The x-axis is a categorial variable that lists the interval for the 4 seconds of the static stretch and also lists the standard deviation at each 20 minute interval.
+
+```{r lineDatavisualization}
+
+```
+###Table Output
+
+outputs a table for 10 sec. before static stretch (baseline tension), peak tension, average tension 3.25-3.27 of 4 sec. static stretch, and minimum tension in an excel (xlsx) format of transposed values with calculated average for each of the 20 minute periods. 
+
+```{r tableOutput}
+
+```
+
+
+
