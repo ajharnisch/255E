@@ -175,4 +175,7 @@ ggplot(mtcars, aes(x=factor(cyl), y=hp)) + geom_violin()
 ggplot(mtcars, aes(x=factor(cyl), y=hp)) +geom_jitter(width = 0.1, height = 0, aes(color = factor(cyl)))
 
 ```
+
+
+```
 ```

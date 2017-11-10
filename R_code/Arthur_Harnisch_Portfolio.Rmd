@@ -1,14 +1,13 @@
 ---
-title: "Portfolio_Outline"
+title: "Portfolio"
 author: "Arthur Harnisch"
-date: "October 31, 2017"
+date: "November 7, 2017"
 output: word_document
 ---
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
 ```
-
 Outline of R Code Function for Muscle Tension Analysis and Graphs
 
 1. Produces a combination line plot (10 sec. before static stretch (baseline tension), peak tension, average tension 3.25-3.27 of 4 sec. static stretch, and minimum tension) that shows the percent variation from baseline (first 20 minutes of experiment) over time of the experiemnt and contains a legend for the date of each trial.
@@ -39,6 +38,10 @@ Required packages: ggplot2.
 install.packages("ggplot2") #this command is commented out untill it becomes necessary to use. 
 
 
+
+#dataloader
+install.packages("DataLoader")
+
 ```
 ###Importing data
 
@@ -46,102 +49,123 @@ A folder named Tension_R was created so that multiple .csv files could be placed
 
 ```{r dataImport}
 
-#multiple data import for control using forloop to find .csv files and rbind
 
-myfiles=dir("../Tension_R/Control", pattern = "*.csv$", all.files = TRUE, full.names = TRUE)
+#load multiple.csv files
 
+#library(DataLoader)
 
-# commented out section, for loop needs modification 
-
-
-#for(i in 1: length(myfiles) ){
-  
-  #open each file
- # read.csv(myfiles[i])
- # temp = read.csv(myfiles[i])
- 
-  #temp$DateTime = as.POSIXct(temp$DateTime, origin = '1970-1-1', tz="")
-  
-# temp$elapsedTime = difftime(temp$DateTime, temp$DateTime[1], units = 'mins') 
- 
-#  temp$elapsedTimeMin = as.numeric(temp$elapsedTime)
-
-  
- #   loc = (regexpr(pattern ="Trial[0-16]*", text = myfiles [i]))
-
-
-# trialNumber = as.numeric(substr(myfiles[i], start = loc[[1]][1]+5, 
-     # stop = loc[[1]][1] + attr(loc, 'match.length')-1))
-  
-# temp$TrialNumber =trialNumber
-  
- #   if ( i == 1){
-# res = temp
- # } else {
-#  res = rbind( res, temp)
-#}
-#}
-
-#res$DateTime = as.POSIXct(res$DateTime, origin = '1970-1-1', tz="")
-
-#res$POSIXt = as.POSIXct(res$POSIXt, origin = '1970-1-1', tz='')
+#temp = importCsv(path = "../Tension_R/Control")
+#list.filenames = list.files("../Tension_R/Control", pattern = "*.csv$")
 
 
 
+
+
+#will import multiple files from a path into one data frame only if the same length
+#library(DataLoader)
+#tem3 = importAllSdf(path = "../Tension_R/Control")
 
 #multiple data import for experiment by use of for loop to find .csv files and rbind. 
 
 myfiles=dir("../Tension_R/Experiment", pattern = "*.csv$", all.files = TRUE, full.names = TRUE)
 
 
-# commented out section, for loop needs modification 
-
-
-#for(i in 1: length(myfiles) ){
+for(i in 1: length(myfiles) ){
   
   #open each file
- # read.csv(myfiles[i])
- # temp = read.csv(myfiles[i])
- 
-  #temp$DateTime = as.POSIXct(temp$DateTime, origin = '1970-1-1', tz="")
+  # read.csv(myfiles[i])
+  temp = read.csv(myfiles[i])
+  fname = basename(myfiles[i])
   
-# temp$elapsedTime = difftime(temp$DateTime, temp$DateTime[1], units = 'mins') 
- 
-#  temp$elapsedTimeMin = as.numeric(temp$elapsedTime)
+  loc = regexpr(pattern = "[[:digit:]]+[-_][[:digit:]][[:alpha:]]", text = fname)
+  trial = substr(fname, start = loc[[1]], stop = loc[[1]] + (attr(loc,'match.length')-1))
+  trial = sub(pattern = '_','-', x= trial)
+  
+  temp2 = temp[-(which(temp$Ramp.. == '')),]
+  
+  macroRows = which(temp2$Ramp.. == 'for macro #:')
+  
+  temp2$Macro = NA
+  
+  for (j in 1:length(macroRows)){
+    macroNum = temp2$BL.tension[macroRows[j]]
+    if (j < length(macroRows)){
+      temp2$Macro[(macroRows[j]+1) : (macroRows[j+1]-1) ] = macroNum
+    } else if (j == length(macroRows)){
+      temp2$Macro[(macroRows[j]+1) : nrow(temp2) ] = macroNum
+    }
+  }
+  
+  temp2 = temp2[-(macroRows), ]
+  temp2 = droplevels(temp2)
+  temp2$Ramp.. = as.numeric(as.character(temp2$Ramp..))
+  temp2$Ramp..[temp2$Ramp.. == 0] = 6
+  
+  temp2$Trial = trial
+
 
   
- #   loc = (regexpr(pattern ="Trial[0-16]*", text = myfiles [i]))
-
-
-# trialNumber = as.numeric(substr(myfiles[i], start = loc[[1]][1]+5, 
-     # stop = loc[[1]][1] + attr(loc, 'match.length')-1))
-  
-# temp$TrialNumber =trialNumber
-  
- #   if ( i == 1){
-# res = temp
- # } else {
-#  res = rbind( res, temp)
-#}
-#}
-
-#res$DateTime = as.POSIXct(res$DateTime, origin = '1970-1-1', tz="")
-
-#res$POSIXt = as.POSIXct(res$POSIXt, origin = '1970-1-1', tz='')
+  if ( i == 1){
+    Exp = temp2
+  } else {
+    Exp = rbind( Exp, temp2)
+  }
+}
 
 
 
-#alternative to importing multiple files 
+#create a data frame for control
 
 myfiles=dir("../Tension_R/Control", pattern = "*.csv$", all.files = TRUE, full.names = TRUE)
 
-Experiemnt <- list.files(pattern = "*.csv$")
+# For control 
+for(i in 1: length(myfiles) ){
+  
+  #open each file
+  # read.csv(myfiles[i])
+  temp = read.csv(myfiles[i])
+  fname = basename(myfiles[i])
+  
+  loc = regexpr(pattern = "[[:digit:]]+[-_][[:digit:]][[:alpha:]]", text = fname)
+  trial = substr(fname, start = loc[[1]], stop = loc[[1]] + (attr(loc,'match.length')-1))
+  trial = sub(pattern = '_','-', x= trial)
+  
+  temp2 = temp[-(which(temp$Ramp.. == '')),]
+  
+  macroRows = which(temp2$Ramp.. == 'for macro #:')
+  
+  temp2$Macro = NA
+  
+  for (j in 1:length(macroRows)){
+    macroNum = temp2$BL.tension[macroRows[j]]
+    if (j < length(macroRows)){
+      temp2$Macro[(macroRows[j]+1) : (macroRows[j+1]-1) ] = macroNum
+    } else if (j == length(macroRows)){
+      temp2$Macro[(macroRows[j]+1) : nrow(temp2) ] = macroNum
+    }
+  }
+  
+  temp2 = temp2[-(macroRows), ]
+  temp2 = droplevels(temp2)
+  temp2$Ramp.. = as.numeric(as.character(temp2$Ramp..))
+  temp2$Ramp..[temp2$Ramp.. == 0] = 6
+  
+  temp2$Trial = trial
 
-my.data <- lapply(my.files, 
-                  read.csv, 
-                  header=TRUE, sep="\t", skip = 40)
+
+  
+  if ( i == 1){
+    Control = temp2
+  } else {
+    Control = rbind( Control, temp2)
+  }
+}
+
+
+              
 
 ```
+
 ###Data manipulation 
 
 This code finds the percent variation from baseline for 10 sec. before static stretch (baseline tension), peak tension, average tension 3.25-3.27 of 4 sec. static stretch, and minimum tension
@@ -153,6 +177,132 @@ This code finds the percent variation from baseline for 10 sec. before static st
 #for loop to perform calculation
 
 
+trialNames = unique(Exp$BL.tension)
+
+ for(i in 1: length(Exp)){
+   trialNameTemp = trialNames[i]
+   
+   temp = Exp[Exp$Trial == trialNameTemp,]
+   
+  mean(as.numeric(Exp$Min.value), na.rm = TRUE )
+}
+
+
+
+
+
+
+
+
+
+for(i in l:length(Exp)){
+  
+  Exp$BL.tension.pvb = mean(Exp$BL.tension, na.rm = FALSE)
+  
+  
+  
+  
+}
+
+
+
+
+
+
+
+fnames = dir("../data/temperature_trials", 
+             pattern = "*.csv", full.names = TRUE)
+
+for (i in 1:length(fnames)){
+
+
+#allows to add new column
+
+
+
+  
+  loc = (regexpr(pattern ="Trial[0-9]*", text = fnames [i]))
+
+
+  trialNumber = as.numeric(substr(fnames[i], start = loc[[1]][1]+5, 
+       stop = loc[[1]][1] + attr(loc, 'match.length')-1))
+  
+  temp$TrialNumber =trialNumber
+  
+ print(trialNumber)
+}
+
+
+
+
+
+
+
+
+
+for(i in 1: length(Exp)){
+ 
+  BL.Tension.PVB = 
+  
+  aggregate()
+  
+}
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+#using elapsed time column until zero and plot, usinh the lines function. you can also append a new column from the import function
+#add a line for pull fiel name out and add it to another column. 
+# pull out the trial number 
+
+###grab the trial number 
+
+fnames = dir("../data/temperature_trials", 
+             pattern = "*.csv", full.names = TRUE)
+
+for (i in 1:length(fnames)){
+
+
+#allows to add new column
+
+
+
+  
+  loc = (regexpr(pattern ="Trial[0-9]*", text = fnames [i]))
+
+
+  trialNumber = as.numeric(substr(fnames[i], start = loc[[1]][1]+5, 
+       stop = loc[[1]][1] + attr(loc, 'match.length')-1))
+  
+  temp$TrialNumber =trialNumber
+  
+ print(trialNumber)
+}
+
+
+
+head(heating)
+
+head(res)
+
+
+#calculate a time for each entry
+
 
 ``` 
 ###Combination line plot
@@ -163,6 +313,21 @@ This code finds the percent variation from baseline for 10 sec. before static st
 
 #commented out needs modification
 #This was an example of multimple line plot from week 8 homework
+
+
+
+ 
+
+ 
+
+
+
+
+
+
+
+
+
 
 #TC0~elapsedTime
 #data = res[res$trialNumber ==1
