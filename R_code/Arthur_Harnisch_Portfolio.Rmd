@@ -42,6 +42,13 @@ install.packages("ggplot2") #this command is commented out untill it becomes nec
 #dataloader
 install.packages("DataLoader")
 
+#dplyr
+install.packages("dplyr")
+
+#quantmod
+install.packages("quantmod")
+
+
 ```
 ###Importing data
 
@@ -177,6 +184,40 @@ This code finds the percent variation from baseline for 10 sec. before static st
 #for loop to perform calculation
 
 
+
+
+#creating new columns precent variation from baseline 
+
+
+temp10 = read.csv("C:\\Users\\Arthur\\255E\\Tension_R\\Control\\analyzed170323_1e.csv.csv", header = TRUE)
+
+
+
+#library(quantmod)
+
+#temp_10 = Delt(temp10$BL.tension, x2= NULL, k= 3:8)
+
+
+
+
+
+
+temp10$min.pvb = temp10$Min.value / mean(temp10$Min.value[3:8])
+
+temp10$rownum = c(1:40)
+
+library(ggplot2)
+ggplot(temp10,aes(rownum, min.pvb))+ 
+  geom_smooth()+
+  geom_point()
+
+
+
+
+
+
+
+
 trialNames = unique(Exp$BL.tension)
 
  for(i in 1: length(Exp)){
@@ -191,14 +232,75 @@ trialNames = unique(Exp$BL.tension)
 
 
 
+Exp$cal1 = 
+  
+  
+  
+
+
+Exp$BL.Tension.pvb = Exp$BL.tension / Exp$BL.tension.start.point
+
+
+start(Exp$Macro == "1")
 
 
 
 
-for(i in l:length(Exp)){
+ temp3 = unique(Exp$Trial)
+
+for((k in 1:length(temp3))){
+  trialNameTemp = temp3[k]
+  temp4 = Exp[Exp$BL.tension] ==tialNameTemp]
+
+
+  
+  
+  
+  
+  
+}
+
+
+
+
+  
+
+
+
+
+
+
+
+  
+  
+  
+  if(k =="1"){
+    
+    Exp$BL.tension.pvb = 
+    
+  
+}
+  
+  
+  
+  
+  
+  
+  
+  Exp$BL.tension.pvb = 
+  
+  
+  
+  
   
   Exp$BL.tension.pvb = mean(Exp$BL.tension, na.rm = FALSE)
   
+  
+  substr()
+  
+  
+  tapply(Exp$BL.tension, Exp$Macro, mean) #matches the macro number to 
+  tapply(Exp$BL.tension, Exp$Macro, sd)
   
   
   
