@@ -37,17 +37,21 @@ Required packages: ggplot2.
 
 install.packages("ggplot2") #this command is commented out untill it becomes necessary to use. 
 
-
-
 #dataloader
 install.packages("DataLoader")
 
 #dplyr
 install.packages("dplyr")
 
-#quantmod
-install.packages("quantmod")
+#splitstackshape
+install.packages("splitstackshape")
 
+
+#reshape
+install.packages("reshape2")
+
+#tidyr
+install.packages("tidyr")
 
 ```
 ###Importing data
@@ -63,10 +67,6 @@ A folder named Tension_R was created so that multiple .csv files could be placed
 
 #temp = importCsv(path = "../Tension_R/Control")
 #list.filenames = list.files("../Tension_R/Control", pattern = "*.csv$")
-
-
-
-
 
 #will import multiple files from a path into one data frame only if the same length
 #library(DataLoader)
@@ -177,235 +177,167 @@ for(i in 1: length(myfiles) ){
 
 This code finds the percent variation from baseline for 10 sec. before static stretch (baseline tension), peak tension, average tension 3.25-3.27 of 4 sec. static stretch, and minimum tension
 
-```{r dataManipulation}
+
+###Percent Variation from Baseline of Experiment 
+
+
+```{r dataManipulation_EXP}
 
 #calculates the percept variation from baseline for each of the trials and makes a seperate column to display the percent from variation 10 sec. before static stretch (baseline tension), peak tension, average tension 3.25-3.27 of 4 sec. static stretch, and minimum tension. 
 
-#for loop to perform calculation
 
 
+#data manipulations are for Experiment group
 
 
-#creating new columns precent variation from baseline 
+# finding the percent variation from baseline (first 6 time points of file) of BL.tension 
 
-
-temp10 = read.csv("C:\\Users\\Arthur\\255E\\Tension_R\\Control\\analyzed170323_1e.csv.csv", header = TRUE)
-
-
-
-#library(quantmod)
-
-#temp_10 = Delt(temp10$BL.tension, x2= NULL, k= 3:8)
-
-
-
-
-
-
-temp10$min.pvb = temp10$Min.value / mean(temp10$Min.value[3:8])
-
-temp10$rownum = c(1:40)
-
-library(ggplot2)
-ggplot(temp10,aes(rownum, min.pvb))+ 
-  geom_smooth()+
-  geom_point()
-
-
-
-
-
-
-
-
-trialNames = unique(Exp$BL.tension)
-
- for(i in 1: length(Exp)){
-   trialNameTemp = trialNames[i]
-   
-   temp = Exp[Exp$Trial == trialNameTemp,]
-   
-  mean(as.numeric(Exp$Min.value), na.rm = TRUE )
-}
-
-
-
-
-
-Exp$cal1 = 
-  
-  
-  
-
-
-Exp$BL.Tension.pvb = Exp$BL.tension / Exp$BL.tension.start.point
-
-
-start(Exp$Macro == "1")
-
-
-
-
- temp3 = unique(Exp$Trial)
-
-for((k in 1:length(temp3))){
-  trialNameTemp = temp3[k]
-  temp4 = Exp[Exp$BL.tension] ==tialNameTemp]
-
-
-  
-  
-  
-  
-  
-}
-
-
-
-
-  
-
-
-
-
-
-
-
-  
-  
-  
-  if(k =="1"){
-    
-    Exp$BL.tension.pvb = 
-    
-  
-}
-  
-  
-  
-  
-  
-  
-  
-  Exp$BL.tension.pvb = 
-  
-  
-  
-  
-  
-  Exp$BL.tension.pvb = mean(Exp$BL.tension, na.rm = FALSE)
-  
-  
-  substr()
-  
-  
-  tapply(Exp$BL.tension, Exp$Macro, mean) #matches the macro number to 
-  tapply(Exp$BL.tension, Exp$Macro, sd)
-  
-  
-  
-}
-
-
-
-
-
-
-
-fnames = dir("../data/temperature_trials", 
-             pattern = "*.csv", full.names = TRUE)
-
-for (i in 1:length(fnames)){
-
-
-#allows to add new column
-
-
-
-  
-  loc = (regexpr(pattern ="Trial[0-9]*", text = fnames [i]))
-
-
-  trialNumber = as.numeric(substr(fnames[i], start = loc[[1]][1]+5, 
-       stop = loc[[1]][1] + attr(loc, 'match.length')-1))
-  
-  temp$TrialNumber =trialNumber
-  
- print(trialNumber)
-}
-
-
-
-
-
-
-
-
-
-for(i in 1: length(Exp)){
  
-  BL.Tension.PVB = 
+
+library(dplyr)
+Exp1 = tbl_df(Exp)
+
+# res = filter(Exp1, Macro == 1, Ramp.. <7)   #dplyr filter 
+
+ res1 = Exp1[Exp1$Macro == 1 & Exp1$Ramp.. < 7,] #base r filter 
+
+res2 = res1 %>%
+  group_by(Trial)%>%
+  summarise(avg_BSL.BL.Tension = mean(BL.tension, na.rm = TRUE))
+
+
+  Exp$avg_BSL.BLtension = res2$avg_BSL.BL.Tension[match(Exp$Trial, res2$Trial)]
+
+
+Exp$pvb.BL.tension = Exp$BL.tension / Exp$avg_BSL.BLtension
+
+
+#finding the percent variation from baseline in Peak tension
+
+res3 = res1 %>%
+  group_by(Trial)%>%
+  summarise(avg_BSL.peak.tension = mean(peak.tension, na.rm = TRUE))
+
+
+ Exp$avg_BSL.peak.tension = res3$avg_BSL.peak.tension[match(Exp$Trial, res3$Trial)]
+ 
+ Exp$pvb.peak.tension = Exp$peak.tension / Exp$avg_BSL.peak.tension
+ 
+ #finding the percent variation form baseline in 3.25 - 3.75 
+ 
+ 
+ res4 = res1 %>%
+  group_by(Trial)%>%
+  summarise(avg_BSL.SR = mean(average.of.all.interval.points, na.rm = TRUE))
+
+
+ Exp$avg_BSL.SR = res4$avg_BSL.SR[match(Exp$Trial, res4$Trial)]
+ 
+ Exp$pvb.SR = Exp$average.of.all.interval.points / Exp$avg_BSL.SR
+
+ 
+ # finding the percent variation from baseline in Minimum values 
+
+ 
   
-  aggregate()
+ res5 = res1 %>%
+  group_by(Trial)%>%
+  summarise(avg_BSL.min = mean(Min.value, na.rm = TRUE))
+
+
+ Exp$avg_BSL.min = res5$avg_BSL.min[match(Exp$Trial, res5$Trial)]
+ 
+ Exp$pvb.min = Exp$Min.value / Exp$avg_BSL.min
+ 
+ 
+ #creating numeric x-axis for plotting that will label the ramp number in the file for each file. 
+ 
+ library(splitstackshape)
+ 
+ Exp5 = getanID(data = Exp, id.vars = "Trial")
+ 
+Exp$ramp.num = Exp5$.id
+
+ 
+
+#reshapping data 
+library(reshape2)
+
+
+
+ 
+```
+
+
+###Percent variation from baseline of Control
+
+This is a code to find the percent variation from baseline of the files that were placed in the folder labeled Control 
+
+
+```{r dataManipulation_Control}
+ 
+ #data manipulation for Control
+ library(dplyr)
+
+ control1 = tbl_df(Control)
+
+# res = filter(Exp1, Macro == 1, Ramp.. <7)   #dplyr filter 
+
+ con1 = control1[control1$Macro == 1 & control1$Ramp.. < 7,] #base r filter 
+
+con2 = con1 %>%
+  group_by(Trial)%>%
+  summarise(avg_BSL.BL.Tension = mean(BL.tension, na.rm = TRUE))
+
+
+  Control$avg_BSL.BLtension = con2$avg_BSL.BL.Tension[match(Control$Trial, con2$Trial)]
+
+
+Control$pvb.BL.tension = Control$BL.tension / Control$avg_BSL.BLtension
+
+
+#finding the percent variation from baseline in Peak tension
+
+con3 = con1 %>%
+  group_by(Trial)%>%
+  summarise(avg_BSL.peak.tension = mean(peak.tension, na.rm = TRUE))
+
+
+ Control$avg_BSL.peak.tension = con3$avg_BSL.peak.tension[match(Control$Trial, con3$Trial)]
+ 
+ Exp$pvb.peak.tension = Exp$peak.tension / Exp$avg_BSL.peak.tension
+ 
+ #finding the percent variation form baseline in 3.25 - 3.75 
+ 
+ 
+ res4 = res1 %>%
+  group_by(Trial)%>%
+  summarise(avg_BSL.SR = mean(average.of.all.interval.points, na.rm = TRUE))
+
+
+ Exp$avg_BSL.SR = res4$avg_BSL.SR[match(Exp$Trial, res2$Trial)]
+ 
+ Exp$pvb.SR = Exp$average.of.all.interval.points / Exp$avg_BSL.SR
+
+ 
+ # finding the percent variation from baseline in Minimum values 
+
+ 
   
-}
+ res5 = res1 %>%
+  group_by(Trial)%>%
+  summarise(avg_BSL.min = mean(Min.value, na.rm = TRUE))
 
 
+ Exp$avg_BSL.min = res5$avg_BSL.min[match(Exp$Trial, res2$Trial)]
+ 
+ Exp$pvb.min = Exp$Min.value / Exp$avg_BSL.min
 
+ 
+ 
 
-
-
-
-
-  
-
-
-
-
-
-
-
-
-
-
-#using elapsed time column until zero and plot, usinh the lines function. you can also append a new column from the import function
-#add a line for pull fiel name out and add it to another column. 
-# pull out the trial number 
-
-###grab the trial number 
-
-fnames = dir("../data/temperature_trials", 
-             pattern = "*.csv", full.names = TRUE)
-
-for (i in 1:length(fnames)){
-
-
-#allows to add new column
-
-
-
-  
-  loc = (regexpr(pattern ="Trial[0-9]*", text = fnames [i]))
-
-
-  trialNumber = as.numeric(substr(fnames[i], start = loc[[1]][1]+5, 
-       stop = loc[[1]][1] + attr(loc, 'match.length')-1))
-  
-  temp$TrialNumber =trialNumber
-  
- print(trialNumber)
-}
-
-
-
-head(heating)
-
-head(res)
-
-
-#calculate a time for each entry
-
-
+ 
+ 
 ``` 
 ###Combination line plot
 
@@ -413,14 +345,20 @@ head(res)
 
 ```{r combinationLineplot}
 
-#commented out needs modification
-#This was an example of multimple line plot from week 8 homework
+
+#plot of baseline tension over time 
+
+
+library(ggplot2)
+        
+ggplot(Exp, aes(x= ramp.num, y= Exp$pvb.BL.tension)) +geom_dotplot()
 
 
 
+
+plot(Exp$ramp.num, Exp$pvb.BL.tension)
  
 
- 
 
 
 
@@ -430,32 +368,6 @@ head(res)
 
 
 
-
-#TC0~elapsedTime
-#data = res[res$trialNumber ==1
-#ploting trial 1 use plot command then lines command 
-
-#firstTrial =1
-#plot(x=res$elapsedTimeMin[res$TrialNumber ==1], y= res$TC0[res$TrialNumber == firstTrial],
-      
-    # type = 'l', 
-     #xlab = 'Elapsed time, Minutes',
-    # ylab = 'temperature C', las = 1,
-#xlim  = c(0,max(res$elapsedTime)),
-#ylim = c(min(res$TC0), max(res$TC0)))
-
-#mtext(text = "Channel TC0 for each Trial", side = 3, line =1.4, cex =  1.5, 
-#adj = 0)
-
-# elapsedTime)),
-
-
-#trialNums = unique(res$TrialNumber)
-
-#for(y in 2:length(trialNums) ){
-  #lines(x = res$elapsedTimeMin[res$TrialNumber == trialNums[y]],
- ## y=res$TC0[res$TrialNumber == trialNums[y]], col = y)
-#}
 
 
 ```
