@@ -1,7 +1,7 @@
 ---
 title: "Portfolio"
 author: "Arthur Harnisch"
-date: "November 7, 2017"
+date: "November 15, 2017"
 output: word_document
 ---
 
@@ -25,33 +25,37 @@ Input files for this code will be .csv files.
 
 Experiments are conducted as a repeated measure design. Treatment and control experiments were conducted as seperate trials. Trials typically occur for 100 mintues. 
 
-Required packages: ggplot2. 
+Required packages: ggplot2, dplyr, splitstackshape. 
 
 
 
 ###Installing Packages
 ```{r packageInstall}
 # Packages necessary for this r code
+#sections are commented out so document can knit
 
 #ggplot2
 
-install.packages("ggplot2") #this command is commented out untill it becomes necessary to use. 
+#install.packages("ggplot2") #this command is commented out untill it becomes necessary to use. 
 
 #dataloader
-install.packages("DataLoader")
+#install.packages("DataLoader")# did not use but thought helpful
 
 #dplyr
-install.packages("dplyr")
+#install.packages("dplyr")
 
 #splitstackshape
-install.packages("splitstackshape")
+#install.packages("splitstackshape")
 
 
 #reshape
-install.packages("reshape2")
+#install.packages("reshape")# did not use but thought helpful
+
+#reshape2
+#install.packages("reshape2")# did not use but thought helpful
 
 #tidyr
-install.packages("tidyr")
+#install.packages("tidyr")# did not use but thought helpful
 
 ```
 ###Importing data
@@ -260,8 +264,12 @@ Exp$ramp.num = Exp5$.id
 
  
 
-#reshapping data 
-library(reshape2)
+
+
+#reshape data for BL tension
+#library(reshape)
+#Exp7 = cast(Exp, ramp.num~Trial, value = "pvb.BL.tension" )
+
 
 
 
@@ -275,7 +283,8 @@ This is a code to find the percent variation from baseline of the files that wer
 
 
 ```{r dataManipulation_Control}
- 
+
+
  #data manipulation for Control
  library(dplyr)
 
@@ -305,63 +314,244 @@ con3 = con1 %>%
 
  Control$avg_BSL.peak.tension = con3$avg_BSL.peak.tension[match(Control$Trial, con3$Trial)]
  
- Exp$pvb.peak.tension = Exp$peak.tension / Exp$avg_BSL.peak.tension
+ Control$pvb.peak.tension = Control$peak.tension / Control$avg_BSL.peak.tension
  
  #finding the percent variation form baseline in 3.25 - 3.75 
  
  
- res4 = res1 %>%
+ con4 = con1 %>%
   group_by(Trial)%>%
   summarise(avg_BSL.SR = mean(average.of.all.interval.points, na.rm = TRUE))
 
 
- Exp$avg_BSL.SR = res4$avg_BSL.SR[match(Exp$Trial, res2$Trial)]
+ Control$avg_BSL.SR = con4$avg_BSL.SR[match(Control$Trial, con2$Trial)]
  
- Exp$pvb.SR = Exp$average.of.all.interval.points / Exp$avg_BSL.SR
+ Control$pvb.SR = Control$average.of.all.interval.points / Control$avg_BSL.SR
 
  
  # finding the percent variation from baseline in Minimum values 
 
  
   
- res5 = res1 %>%
+ con5 = con1 %>%
   group_by(Trial)%>%
   summarise(avg_BSL.min = mean(Min.value, na.rm = TRUE))
 
 
- Exp$avg_BSL.min = res5$avg_BSL.min[match(Exp$Trial, res2$Trial)]
+ Control$avg_BSL.min = con5$avg_BSL.min[match(Control$Trial, con2$Trial)]
  
- Exp$pvb.min = Exp$Min.value / Exp$avg_BSL.min
+ Control$pvb.min = Control$Min.value / Control$avg_BSL.min
 
  
  
+ library(splitstackshape)
+ 
+ Control5 = getanID(data = Control, id.vars = "Trial")
+ 
+Control$ramp.num = Control5$.id
+
+ 
+
+
+
+#reshape data for BL tension
+#library(reshape)
+#Exp7 = cast(Exp, ramp.num~Trial, value = "pvb.BL.tension" )
 
  
  
 ``` 
 ###Combination line plot
 
- Produces a combination line plot (10 sec. before static stretch (baseline tension), peak tension, average tension 3.25-3.27 of 4 sec. static stretch, and minimum tension) that shows the percent variation from baseline (first 20 minutes of experiment) over time of the experiemnt and contains a legend for the date of each trial.
+ Produces a combination line plot (10 sec. before static stretch (baseline tension), peak tension, average tension 3.25-3.27 of 4 sec. static stretch, and minimum tension) that shows the percent variation from baseline (first 20 minutes of experiment) over time of the experiemnt and contains a legend for the date of each trial. This was accoomplished in two steps 1st chunk allows for individual plots to be created so that modifications can be made and second combining the plots. 
+
+```{r CombinationLineplot}
+
+
+#graphs for Experiment group
+
+#plot of baseline tension over time and will display each graph individually for Experiment group
+
+library(ggplot2)
+
+ggplot(Exp, aes(x= ramp.num, y= pvb.BL.tension, color = Trial)) +geom_line()+ ggtitle("Baseline Tension")+theme(plot.title = element_text(hjust=0.5)) +scale_x_continuous("Time(Min.)")+scale_y_continuous("Percent varation from baseline")
+
+
+#plot of peak tension
+
+ggplot(Exp, aes(x = ramp.num, y=pvb.peak.tension, color = Trial)) +geom_line()+ggtitle("Peak Tension")+
+theme(plot.title = element_text(hjust=0.5))+scale_x_continuous("Time(Min.)")+scale_y_continuous("Percent varation from baseline")
+
+
+#plot of peak plateu 3.25-3.75
+
+ggplot(Exp, aes(x=ramp.num, y=pvb.SR, color= Trial))+geom_line() +ggtitle("SR") +
+  theme(plot.title = element_text(hjust=0.5))+scale_x_continuous("Time(Min.)")+scale_y_continuous("Percent varation from baseline")
+
+
+
+#plot of min tension
+
+ggplot(Exp, aes(x=ramp.num, y=pvb.min, color = Trial))+geom_line() +ggtitle("Minimum")+
+  theme(plot.title = element_text(hjust=0.5))+scale_x_continuous("Time(Min.)")+scale_y_continuous("Percent varation from baseline")
+
+
+
+#plot of graphs for control group
+
+
+ggplot(Control, aes(x= ramp.num, y= pvb.BL.tension, color = Trial)) +geom_line() +ggtitle("Baseline Tension")+
+  theme(plot.title = element_text(hjust=0.5))+scale_x_continuous("Time(Min.)")+scale_y_continuous("Percent varation from baseline")
+
+
+
+#plot of peak tension
+
+ggplot(Control, aes(x = ramp.num, y=pvb.peak.tension, color = Trial)) +geom_line()+ggtitle("control Peak Tension")+
+  theme(plot.title = element_text(hjust=0.5))+scale_x_continuous("Time(Min.)")+scale_y_continuous("Percent varation from baseline")
+
+
+
+#plot of peak plateu 3.25-3.75
+
+ggplot(Control, aes(x=ramp.num, y=pvb.SR, color= Trial))+geom_line() +ggtitle("Control SR")+
+  theme(plot.title = element_text(hjust=0.5))+scale_x_continuous("Time(Min.)")+scale_y_continuous("Percent varation from baseline")
+
+
+
+#plot of min tension
+
+ggplot(Control, aes(x=ramp.num, y=pvb.min, color = Trial))+geom_line() +ggtitle("Control Minimum")+
+  theme(plot.title = element_text(hjust=0.5))+scale_x_continuous("Time(Min.)")+scale_y_continuous("Percent varation from baseline")
+
+
+
+
+```
 
 ```{r combinationLineplot}
 
+#combining the individual plots so they can be compared
 
-#plot of baseline tension over time 
 
+# new funciton called multiple plot funciton
+
+# Multiple plot function
+#
+# ggplot objects can be passed in ..., or to plotlist (as a list of ggplot objects)
+# - cols:   Number of columns in layout
+# - layout: A matrix specifying the layout. If present, 'cols' is ignored.
+#
+# If the layout is something like matrix(c(1,2,3,3), nrow=2, byrow=TRUE),
+# then plot 1 will go in the upper left, 2 will go in the upper right, and
+# 3 will go all the way across the bottom.
+#
+multiplot <- function(..., plotlist=NULL, file, cols=1, layout=NULL) {
+  library(grid)
+
+  # Make a list from the ... arguments and plotlist
+  plots <- c(list(...), plotlist)
+
+  numPlots = length(plots)
+
+  # If layout is NULL, then use 'cols' to determine layout
+  if (is.null(layout)) {
+    # Make the panel
+    # ncol: Number of columns of plots
+    # nrow: Number of rows needed, calculated from # of cols
+    layout <- matrix(seq(1, cols * ceiling(numPlots/cols)),
+                    ncol = cols, nrow = ceiling(numPlots/cols))
+  }
+
+ if (numPlots==1) {
+    print(plots[[1]])
+
+  } else {
+    # Set up the page
+    grid.newpage()
+    pushViewport(viewport(layout = grid.layout(nrow(layout), ncol(layout))))
+
+    # Make each plot, in the correct location
+    for (i in 1:numPlots) {
+      # Get the i,j matrix positions of the regions that contain this subplot
+      matchidx <- as.data.frame(which(layout == i, arr.ind = TRUE))
+
+      print(plots[[i]], vp = viewport(layout.pos.row = matchidx$row,
+                                      layout.pos.col = matchidx$col))
+    }
+  }
+}
+
+
+
+
+
+
+
+
+
+#create labels for each plot
 
 library(ggplot2)
-        
-ggplot(Exp, aes(x= ramp.num, y= Exp$pvb.BL.tension)) +geom_dotplot()
+
+a1 = ggplot(Exp, aes(x= ramp.num, y= pvb.BL.tension, color = Trial)) +geom_line()+ ggtitle("Baseline Tension")+theme(plot.title = element_text(hjust=0.5)) +scale_x_continuous("Time(Min.)")+scale_y_continuous("Percent varation from baseline")
+
+
+#plot of peak tension
+
+b1 =ggplot(Exp, aes(x = ramp.num, y=pvb.peak.tension, color = Trial)) +geom_line()+ggtitle("Peak Tension")+
+theme(plot.title = element_text(hjust=0.5))+scale_x_continuous("Time(Min.)")+scale_y_continuous("Percent varation from baseline")
+
+
+#plot of peak plateu 3.25-3.75
+
+c1 =ggplot(Exp, aes(x=ramp.num, y=pvb.SR, color= Trial))+geom_line() +ggtitle("SR") +
+  theme(plot.title = element_text(hjust=0.5))+scale_x_continuous("Time(Min.)")+scale_y_continuous("Percent varation from baseline")
+
+
+#plot of min tension
+
+d1 =ggplot(Exp, aes(x=ramp.num, y=pvb.min, color = Trial))+geom_line() +ggtitle("Minimum")+
+  theme(plot.title = element_text(hjust=0.5))+scale_x_continuous("Time(Min.)")+scale_y_continuous("Percent varation from baseline")
+
+library(ggplot2)
+
+#use the multiplot function to combine all plots in multiplot function
+
+multiplot(a1,b1,c1,d1, cols =2)
 
 
 
-
-plot(Exp$ramp.num, Exp$pvb.BL.tension)
- 
+#creates plots comparing treatment to control
 
 
 
+#plot of graphs for control group
 
+
+a2 = ggplot(Control, aes(x= ramp.num, y= pvb.BL.tension, color = Trial)) +geom_line() +ggtitle("Baseline Tension")+
+  theme(plot.title = element_text(hjust=0.5))+scale_x_continuous("Time(Min.)")+scale_y_continuous("Percent varation from baseline")
+
+
+
+#plot of peak tension
+
+b2 = ggplot(Control, aes(x = ramp.num, y=pvb.peak.tension, color = Trial)) +geom_line()+ggtitle("control Peak Tension")+
+  theme(plot.title = element_text(hjust=0.5))+scale_x_continuous("Time(Min.)")+scale_y_continuous("Percent varation from baseline")
+
+
+#plot of peak plateu 3.25-3.75
+
+c2 = ggplot(Control, aes(x=ramp.num, y=pvb.SR, color= Trial))+geom_line() +ggtitle("Control SR")+
+  theme(plot.title = element_text(hjust=0.5))+scale_x_continuous("Time(Min.)")+scale_y_continuous("Percent varation from baseline")
+
+#plot of min tension
+
+d2 = ggplot(Control, aes(x=ramp.num, y=pvb.min, color = Trial))+geom_line() +ggtitle("Control Minimum")+
+  theme(plot.title = element_text(hjust=0.5))+scale_x_continuous("Time(Min.)")+scale_y_continuous("Percent varation from baseline")
+
+
+multiplot(a1,b1, c1,d1, a2, b2, c2, d2, cols =2)
 
 
 
@@ -373,18 +563,40 @@ plot(Exp$ramp.num, Exp$pvb.BL.tension)
 ```
 ###Plot of averages
 
-Produces a plot of averages compared to time of experiment for multiple trials for average tension 3.25-3.75 of 4 sec. static stretch with error bars. 
+Produces a plot of averages compared to time of experiment for multiple trials for average tension 3.25-3.75 of 4 sec. static stretch with error bars. The plot will compare experiment and control
 
 ```{r plotAverages}
 
-#tell r to load ggplot 2 package
-#library(ggplot2) #commented out until functional
+#groups the ramp number and takes the average of all SR values for both experiment and control
 
-#plot of averages
-#commented out until functional
 
-#ggplot(WordTypes, aes(x = Time, y = WordTypes, colour = SES)) + geom_line(aes(group = SES)) + 
-   # geom_point() + geom_errorbar(limits, width = 0.25)
+#experiment subset and calculation of mean
+library(dplyr)
+
+Exp8 = Exp %>%
+  group_by(ramp.num)%>%
+  summarise(average.SR = mean(average.of.all.interval.points, na.rm =TRUE))
+
+#control subset and calculation of mean
+
+con10 = Control %>%
+  group_by(ramp.num)%>%
+  summarise(average.SR = mean(average.of.all.interval.points, na.rm = TRUE))
+
+#plot experiment and control
+
+library(ggplot2)
+
+
+#baseplot for Experiment group
+
+ggplot(Exp8, aes(ramp.num, average.SR, color = average.SR)) + geom_point()+geom_line()
+
++stat_summary(fun.data = mean_cl_normal, geom = "errorbar", width = .2)
+
+
+
+
 
 ```
 ###Dot plots with mean and error bars
@@ -394,12 +606,23 @@ Produces two dot plots with mean error bars that compares percent variation from
 ```{r dotPlot}
 
 
+
+
+
+
+
+
 ```
 ###Line plot with data visulization and standard deviation
 
 Produces a line plot of peak tension as a percent variation from baseline tension over time of experiment. This graph also incudes a picture of the instentaneous firing frequency caused by the third static stretch from each 20 mintue period above thee title of the graph. The x-axis is a categorial variable that lists the interval for the 4 seconds of the static stretch and also lists the standard deviation at each 20 minute interval.
 
 ```{r lineDatavisualization}
+
+
+
+
+
 
 ```
 ###Table Output
@@ -408,6 +631,13 @@ outputs a table for 10 sec. before static stretch (baseline tension), peak tensi
 
 ```{r tableOutput}
 
+#setwd("C:\\Users\\Arthur\\255E\\Tension_R\\Exp_output")
+
+#Exp 9 will be equal to the data frame that is being output to the folder. 
+
+#Exp9 = j#j in place currently untill data frame can be created
+
+#write.csv(Exp9, file = "Exp_Output", append = FALSE, sep = ",", col.names = TRUE)
 ```
 
 
