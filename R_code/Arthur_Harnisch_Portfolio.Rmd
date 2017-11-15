@@ -569,13 +569,24 @@ Produces a plot of averages compared to time of experiment for multiple trials f
 
 #groups the ramp number and takes the average of all SR values for both experiment and control
 
+#experimnet group calculations
 
 #experiment subset and calculation of mean
 library(dplyr)
 
-Exp8 = Exp %>%
-  group_by(ramp.num)%>%
-  summarise(average.SR = mean(average.of.all.interval.points, na.rm =TRUE))
+
+long.Exp = data.frame(Exp$ramp.num)
+long.Exp$average.all.interval.points = Exp$average.of.all.interval.points
+long.Exp$Trial = Exp$Trial
+
+
+
+
+#
+
+
+
+
 
 #control subset and calculation of mean
 
