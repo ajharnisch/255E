@@ -49,13 +49,14 @@ Required packages: ggplot2, dplyr, splitstackshape.
 
 
 #reshape
-#install.packages("reshape")# did not use but thought helpful
+#install.packages("reshape")
 
 #reshape2
 #install.packages("reshape2")# did not use but thought helpful
 
 #tidyr
 #install.packages("tidyr")# did not use but thought helpful
+
 
 ```
 ###Importing data
@@ -350,15 +351,8 @@ con3 = con1 %>%
  
 Control$ramp.num = Control5$.id
 
- 
-
-
-
-#reshape data for BL tension
 #library(reshape)
-#Exp7 = cast(Exp, ramp.num~Trial, value = "pvb.BL.tension" )
-
- 
+#Exp7 = cast(Exp, ramp.num~Trial, value = "average.of.all.interval.points")
  
 ``` 
 ###Combination line plot
@@ -374,25 +368,42 @@ Control$ramp.num = Control5$.id
 
 library(ggplot2)
 
-ggplot(Exp, aes(x= ramp.num, y= pvb.BL.tension, color = Trial)) +geom_line()+ ggtitle("Baseline Tension")+theme(plot.title = element_text(hjust=0.5)) +scale_x_continuous("Time(Min.)")+scale_y_continuous("Percent varation from baseline")
+ggplot(Exp, aes(x= ramp.num, y= pvb.BL.tension, color = Trial)) +
+    geom_point()+
+  geom_line()+
+  geom_smooth(method ="lm", se=FALSE, color = "black", aes (group = 1))+ 
+  ggtitle("Baseline Tension")+
+  theme(plot.title = element_text(hjust=0.5)) +scale_x_continuous("Time(Min.)")+scale_y_continuous("Percent varation from baseline")
 
 
 #plot of peak tension
 
-ggplot(Exp, aes(x = ramp.num, y=pvb.peak.tension, color = Trial)) +geom_line()+ggtitle("Peak Tension")+
+ggplot(Exp, aes(x = ramp.num, y=pvb.peak.tension, color = Trial)) +
+    geom_point()+
+  geom_line()+
+  geom_smooth(method ="lm", se=FALSE, color = "black", aes (group = 1))+
+  ggtitle("Peak Tension")+
 theme(plot.title = element_text(hjust=0.5))+scale_x_continuous("Time(Min.)")+scale_y_continuous("Percent varation from baseline")
 
 
 #plot of peak plateu 3.25-3.75
 
-ggplot(Exp, aes(x=ramp.num, y=pvb.SR, color= Trial))+geom_line() +ggtitle("SR") +
+ggplot(Exp, aes(x=ramp.num, y=pvb.SR, color= Trial))+
+    geom_point()+
+  geom_line()+
+  geom_smooth(method ="lm", se=FALSE, color = "black", aes (group = 1))+
+  ggtitle("SR") +
   theme(plot.title = element_text(hjust=0.5))+scale_x_continuous("Time(Min.)")+scale_y_continuous("Percent varation from baseline")
 
 
 
 #plot of min tension
 
-ggplot(Exp, aes(x=ramp.num, y=pvb.min, color = Trial))+geom_line() +ggtitle("Minimum")+
+ggplot(Exp, aes(x=ramp.num, y=pvb.min, color = Trial))+
+    geom_point()+
+  geom_line()+
+  geom_smooth(method ="lm", se=FALSE, color = "black", aes (group = 1)) +
+  ggtitle("Minimum")+
   theme(plot.title = element_text(hjust=0.5))+scale_x_continuous("Time(Min.)")+scale_y_continuous("Percent varation from baseline")
 
 
@@ -400,32 +411,54 @@ ggplot(Exp, aes(x=ramp.num, y=pvb.min, color = Trial))+geom_line() +ggtitle("Min
 #plot of graphs for control group
 
 
-ggplot(Control, aes(x= ramp.num, y= pvb.BL.tension, color = Trial)) +geom_line() +ggtitle("Baseline Tension")+
+ggplot(Control, aes(x= ramp.num, y= pvb.BL.tension, color = Trial)) +
+    geom_point()+
+     geom_line()+
+  geom_smooth(method ="lm", se=FALSE, color = "black", aes (group = 1))+
+  ggtitle("Baseline Tension")+
   theme(plot.title = element_text(hjust=0.5))+scale_x_continuous("Time(Min.)")+scale_y_continuous("Percent varation from baseline")
 
 
 
 #plot of peak tension
 
-ggplot(Control, aes(x = ramp.num, y=pvb.peak.tension, color = Trial)) +geom_line()+ggtitle("control Peak Tension")+
+ggplot(Control, aes(x = ramp.num, y=pvb.peak.tension, color = Trial))+
+    geom_point()+
+  geom_line()+
+  geom_smooth(method ="lm", se=FALSE, color = "black", aes (group = 1))+
+ggtitle("control Peak Tension")+
   theme(plot.title = element_text(hjust=0.5))+scale_x_continuous("Time(Min.)")+scale_y_continuous("Percent varation from baseline")
 
 
 
 #plot of peak plateu 3.25-3.75
 
-ggplot(Control, aes(x=ramp.num, y=pvb.SR, color= Trial))+geom_line() +ggtitle("Control SR")+
+ggplot(Control, aes(x=ramp.num, y=pvb.SR, color= Trial))+  
+  geom_point()+
+  geom_line()+
+  geom_smooth(method ="lm", se=FALSE, color = "black", aes (group = 1)) +
+  ggtitle("Control SR")+
   theme(plot.title = element_text(hjust=0.5))+scale_x_continuous("Time(Min.)")+scale_y_continuous("Percent varation from baseline")
 
 
 
 #plot of min tension
 
-ggplot(Control, aes(x=ramp.num, y=pvb.min, color = Trial))+geom_line() +ggtitle("Control Minimum")+
-  theme(plot.title = element_text(hjust=0.5))+scale_x_continuous("Time(Min.)")+scale_y_continuous("Percent varation from baseline")
+ggplot(Control, aes(x=ramp.num, y=pvb.min, color = Trial))+
+  geom_point()+
+  geom_line()+
+  geom_smooth(method ="lm", se=FALSE, color = "black", aes (group = 1))+
+  ggtitle("Control Minimum")+
+  theme(plot.title = element_text(hjust=0.5))+
+  scale_x_continuous("Time(Min.)")+
+  scale_y_continuous("Percent varation from baseline")
 
 
 
+
+
+
+#test 
 
 ```
 
@@ -490,23 +523,23 @@ multiplot <- function(..., plotlist=NULL, file, cols=1, layout=NULL) {
 
 
 
-#create labels for each plot
+#create labels for each plot Experiment 
 
 library(ggplot2)
 
-a1 = ggplot(Exp, aes(x= ramp.num, y= pvb.BL.tension, color = Trial)) +geom_line()+ ggtitle("Baseline Tension")+theme(plot.title = element_text(hjust=0.5)) +scale_x_continuous("Time(Min.)")+scale_y_continuous("Percent varation from baseline")
+a1 = ggplot(Exp, aes(x= ramp.num, y= pvb.BL.tension, color = Trial)) +geom_line()+ ggtitle("Baseline Tension")+theme(plot.title = element_text(hjust=0.5)) +scale_x_continuous("Time(Min.)")+scale_y_continuous("Percent varation from baseline")+theme(legend.position = "none")
 
 
 #plot of peak tension
 
 b1 =ggplot(Exp, aes(x = ramp.num, y=pvb.peak.tension, color = Trial)) +geom_line()+ggtitle("Peak Tension")+
-theme(plot.title = element_text(hjust=0.5))+scale_x_continuous("Time(Min.)")+scale_y_continuous("Percent varation from baseline")
+theme(plot.title = element_text(hjust=0.5))+scale_x_continuous("Time(Min.)")+scale_y_continuous("Percent varation from baseline")+theme(legend.position = "none")
 
 
 #plot of peak plateu 3.25-3.75
 
 c1 =ggplot(Exp, aes(x=ramp.num, y=pvb.SR, color= Trial))+geom_line() +ggtitle("SR") +
-  theme(plot.title = element_text(hjust=0.5))+scale_x_continuous("Time(Min.)")+scale_y_continuous("Percent varation from baseline")
+  theme(plot.title = element_text(hjust=0.5))+scale_x_continuous("Time(Min.)")+scale_y_continuous("Percent varation from baseline")+theme(legend.position = "none")
 
 
 #plot of min tension
@@ -514,11 +547,43 @@ c1 =ggplot(Exp, aes(x=ramp.num, y=pvb.SR, color= Trial))+geom_line() +ggtitle("S
 d1 =ggplot(Exp, aes(x=ramp.num, y=pvb.min, color = Trial))+geom_line() +ggtitle("Minimum")+
   theme(plot.title = element_text(hjust=0.5))+scale_x_continuous("Time(Min.)")+scale_y_continuous("Percent varation from baseline")
 
-library(ggplot2)
+
+
 
 #use the multiplot function to combine all plots in multiplot function
 
-multiplot(a1,b1,c1,d1, cols =2)
+multiplot(a1,b1,c1,d1, cols=2)
+
+
+
+
+
+#creating labels for control plot 
+
+a_2 = ggplot(Control, aes(x= ramp.num, y= pvb.BL.tension, color = Trial)) +geom_line() +ggtitle("Control Baseline Tension")+
+  theme(plot.title = element_text(hjust=0.5))+theme(legend.position = "none")+
+scale_x_continuous("Time(Min.)")+scale_y_continuous("Percent varation from baseline")+theme(legend.position = "none")
+
+
+#plot of peak tension
+
+b_2 = ggplot(Control, aes(x = ramp.num, y=pvb.peak.tension, color = Trial)) +geom_line()+ggtitle("Control Peak Tension")+
+  theme(plot.title = element_text(hjust=0.5))+
+  scale_x_continuous("Time(Min.)")+scale_y_continuous("Percent varation from baseline")+theme(legend.position = "none")
+
+
+#plot of peak plateu 3.25-3.75
+
+c_2 = ggplot(Control, aes(x=ramp.num, y=pvb.SR, color= Trial))+geom_line() +ggtitle("Control SR")+
+  theme(plot.title = element_text(hjust=0.5))+
+  scale_x_continuous("Time(Min.)")+scale_y_continuous("Percent varation from baseline")+theme(legend.position = "none")
+#plot of min tension
+
+d_2 = ggplot(Control, aes(x=ramp.num, y=pvb.min, color = Trial))+geom_line() +ggtitle("Control Minimum")+
+  theme(plot.title = element_text(hjust=0.5))+scale_x_continuous("Time(Min.)")+scale_x_continuous("Time(Min.)")+scale_y_continuous("Percent varation from baseline")
+
+
+multiplot(a_2,b_2,c_2,d_2, cols = 2)
 
 
 
@@ -528,42 +593,59 @@ multiplot(a1,b1,c1,d1, cols =2)
 
 #plot of graphs for control group
 
+a_1 = ggplot(Exp, aes(x= ramp.num, y= pvb.BL.tension, color = Trial)) +geom_line()+ ggtitle("Baseline Tension")+theme(plot.title = element_text(hjust=0.5)) +theme(legend.position = "none")+labs(x = NULL, y=NULL)
 
-a2 = ggplot(Control, aes(x= ramp.num, y= pvb.BL.tension, color = Trial)) +geom_line() +ggtitle("Baseline Tension")+
-  theme(plot.title = element_text(hjust=0.5))+scale_x_continuous("Time(Min.)")+scale_y_continuous("Percent varation from baseline")
+
+#plot of peak tension
+
+b_1 =ggplot(Exp, aes(x = ramp.num, y=pvb.peak.tension, color = Trial)) +geom_line()+ggtitle("Peak Tension")+
+theme(plot.title = element_text(hjust=0.5))+theme(legend.position = "none")+labs(x = NULL, y=NULL)
+
+
+#plot of peak plateu 3.25-3.75
+
+c_1 =ggplot(Exp, aes(x=ramp.num, y=pvb.SR, color= Trial))+geom_line() +ggtitle("SR") +
+  theme(plot.title = element_text(hjust=0.5))+theme(legend.position = "none")+labs(x = NULL, y=NULL)
+
+
+#plot of min tension
+
+d_3 =ggplot(Exp, aes(x=ramp.num, y=pvb.min, color = Trial))+geom_line() +ggtitle("Minimum")+
+  theme(plot.title = element_text(hjust=0.5))+scale_x_continuous("Time(Min.)")+theme(legend.position = "none")+labs(y=NULL)
+
+
+
+a2 = ggplot(Control, aes(x= ramp.num, y= pvb.BL.tension, color = Trial)) +geom_line() +ggtitle("Control Baseline Tension")+
+  theme(plot.title = element_text(hjust=0.5))+theme(legend.position = "none")+labs(x = NULL, y=NULL)
 
 
 
 #plot of peak tension
 
-b2 = ggplot(Control, aes(x = ramp.num, y=pvb.peak.tension, color = Trial)) +geom_line()+ggtitle("control Peak Tension")+
-  theme(plot.title = element_text(hjust=0.5))+scale_x_continuous("Time(Min.)")+scale_y_continuous("Percent varation from baseline")
+b2 = ggplot(Control, aes(x = ramp.num, y=pvb.peak.tension, color = Trial)) +geom_line()+ggtitle("Control Peak Tension")+
+  theme(plot.title = element_text(hjust=0.5))+theme(legend.position = "none")+labs(x = NULL, y=NULL)
 
 
 #plot of peak plateu 3.25-3.75
 
 c2 = ggplot(Control, aes(x=ramp.num, y=pvb.SR, color= Trial))+geom_line() +ggtitle("Control SR")+
-  theme(plot.title = element_text(hjust=0.5))+scale_x_continuous("Time(Min.)")+scale_y_continuous("Percent varation from baseline")
+  theme(plot.title = element_text(hjust=0.5))+theme(legend.position = "none")+labs(x = NULL, y=NULL)
 
 #plot of min tension
 
 d2 = ggplot(Control, aes(x=ramp.num, y=pvb.min, color = Trial))+geom_line() +ggtitle("Control Minimum")+
-  theme(plot.title = element_text(hjust=0.5))+scale_x_continuous("Time(Min.)")+scale_y_continuous("Percent varation from baseline")
-
-
-multiplot(a1,b1, c1,d1, a2, b2, c2, d2, cols =2)
+  theme(plot.title = element_text(hjust=0.5))+scale_x_continuous("Time(Min.)")+theme(legend.position = "none")+labs(y=NULL)
 
 
 
-
-
+multiplot(a2, b2, c2, d2,a_1,b_1, c_1,d_3, cols =2)
 
 
 
 ```
 ###Plot of averages
 
-Produces a plot of averages compared to time of experiment for multiple trials for average tension 3.25-3.75 of 4 sec. static stretch with error bars. The plot will compare experiment and control
+Produces a plot of averages compared to time of experiment for multiple trials for average tension 3.25-3.75 of 4 sec. static stretch with error bars. A plot will be generated for treatment, control, and for treatment and control.  
 
 ```{r plotAverages}
 
@@ -571,56 +653,193 @@ Produces a plot of averages compared to time of experiment for multiple trials f
 
 #experimnet group calculations
 
-#experiment subset and calculation of mean
+#experiment subset and calculation of mean, standard deviation, and standard error. 
+
 library(dplyr)
 
 
-long.Exp = data.frame(Exp$ramp.num)
-long.Exp$average.all.interval.points = Exp$average.of.all.interval.points
-long.Exp$Trial = Exp$Trial
+Exp8 = Exp %>%
+  group_by(Macro)%>%
+  summarise(avg.all.macro = mean(average.of.all.interval.points, na.rm = TRUE))
 
 
+ Exp8_sd = Exp%>%
+  group_by(Macro)%>%
+  summarise(sd = sd(average.of.all.interval.points, na.rm = TRUE))
 
+ Exp8$sd = Exp8_sd$sd
+ 
+Exp10 = as.data.frame(table(Exp$Macro))
+  Exp9 =  sqrt(Exp10$Freq)
+ Exp8$SE = Exp8$sd / Exp9
 
-#
+ Exp8$ymin = Exp8$avg.all.macro - Exp8$SE
+ Exp8$ymax = Exp8$avg.all.macro + Exp8$SE
+ 
+ Exp8$type = "Drug"
+ 
+#control subset and calculation of mean, standard deviation, and standard error.  
+ 
+ Con8 = Control %>%
+  group_by(Macro)%>%
+  summarise(avg.all.macro = mean(average.of.all.interval.points, na.rm = TRUE))
 
+ Con8_sd = Control%>%
+  group_by(Macro)%>%
+  summarise(sd = sd(average.of.all.interval.points, na.rm = TRUE))
 
+ Con8$sd = Con8_sd$sd
+ 
+ 
+Con10 = as.data.frame(table(Exp$Macro))
+   Con9 =  sqrt(Con10$Freq)
+   Con8$SE = Con8$sd / Con9
 
-
-
-#control subset and calculation of mean
-
-con10 = Control %>%
-  group_by(ramp.num)%>%
-  summarise(average.SR = mean(average.of.all.interval.points, na.rm = TRUE))
-
-#plot experiment and control
+   Con8$ymin = Con8$avg.all.macro - Con8$SE
+   Con8$ymax = Con8$avg.all.macro + Con8$SE
+   
+    Con8$type = "Control"
+ 
+ 
+    
+    #binds data frame to compare treatment and control in plot
+     graph1 = rbind(Exp8, Con8)
+ 
+     
+     
+     
 
 library(ggplot2)
 
+#plot of treatment group
+   ggplot(Exp8,aes(x=Macro, y=avg.all.macro, group = type, color = type)) + 
+   geom_errorbar(aes(ymin= ymin, ymax=ymax), width= .1) +
+    geom_line() +
+     scale_colour_manual(values = "steelblue")+
+    geom_point()+
+       ggtitle("Average SR versus Time for Treatment Group\n")+
+  theme(plot.title = element_text(hjust=0.5))+
+  labs(x="Time\n", y = "Average SR\n")
+     
+     
+   
+     
+#plot of control group 
+     
+   ggplot(Con8, aes(x=Macro, y=avg.all.macro, group =type, color = type)) + 
+   geom_errorbar(aes(ymin= ymin, ymax=ymax), width=.1) +
+    geom_line() +
+     scale_colour_manual(values = "darkblue")+
+    geom_point()+
+       ggtitle("Average SR versus Time for Control Group\n")+
+  theme(plot.title = element_text(hjust=0.5))+
+  labs(x="Time\n", y = "Average SR\n")
+     
+# side by side plot of control and treatment 
+   
+    z1= ggplot(Exp8,aes(x=Macro, y=avg.all.macro, colour= type)) + 
+   geom_errorbar(aes(ymin= ymin, ymax=ymax), width=.1) +
+    geom_line() +
+    geom_point()
+     
+ z2=  ggplot(Con8, aes(x=Macro, y=avg.all.macro, colour= type)) + 
+   geom_errorbar(aes(ymin= ymin, ymax=ymax), width=.1) +
+    geom_line() +
+    geom_point()
+   
+   
+ #multiplot(z1,z2, cols = 1)  
+     
+# single graph comparing treatment and control
+ 
+ggplot(graph1, aes(x=Macro, y=avg.all.macro, colour= type)) + 
+   geom_errorbar(aes(ymin= ymin, ymax=ymax), width=.1) +
+    geom_line() +
+    geom_point()+
+    ggtitle("Average SR versus Time for Treatment and Control\n")+
+  theme(plot.title = element_text(hjust=0.5))+
+  labs(x="Time\n", y = "Average SR\n")
 
-#baseplot for Experiment group
-
-ggplot(Exp8, aes(ramp.num, average.SR, color = average.SR)) + geom_point()+geom_line()
-
-+stat_summary(fun.data = mean_cl_normal, geom = "errorbar", width = .2)
 
 
 
+#faceting data to compare treatment and control
+Exp_Con = rbind(Exp8,Con8)
 
-
+ggplot(Exp_Con, aes(x=Macro, y=avg.all.macro, group = type, color = type))+
+  geom_line()+
+  scale_colour_manual(values = c("steelblue", "darkblue"))+
+  geom_point()+
+  geom_errorbar(aes(ymin=ymin, ymax=ymax), width = .1)+
+  facet_grid(type~.)+
+  ggtitle("Average SR versus Time for Treatment and Control\n")+
+  theme(plot.title = element_text(hjust=0.5))+
+#theme(legend.position = "none")#+   #uncomment if you want to remove legend
+#expand_limits(y=0)#+   #if you want to change the limits of the y-axis, uncomment and set the scale for y axis
+labs(x="Time\n", y = "Average SR\n")
+  
 ```
 ###Dot plots with mean and error bars
 
-Produces two dot plots with mean error bars that compares percent variation from baseline (first 20 minutes of experiemnt) to average value for each 20 minutes of the experiment for both treatment and control trials. 
+Produces two dot plots with error bars that will compare the percent variation from baseline for both the treatment and control groups for baseline tension.  
+
 
 ```{r dotPlot}
 
+#Experimental group subsetting and calculation of mean, standard deviation, and standard error. 
+
+library(dplyr)
+Exp_11 = Exp%>%
+  group_by(Macro)%>%
+  summarise(avg = mean(BL.tension, na.rm = TRUE))
+ 
+Exp_12 = Exp%>%
+  group_by(Macro)%>%
+  summarise(SD = sd(BL.tension, na.rm=TRUE))
+
+Exp_13 = as.data.frame(table(Exp$Macro))
+Exp_11$SD = Exp_12$SD
+Exp_11$n = as.numeric(Exp_13$Freq)
+Exp_11$sqrt = sqrt(Exp_11$n)
+Exp_11$SE = Exp_11$SD / Exp_11$sqrt
+Exp_11$ymin = Exp_11$avg - Exp_11$SE
+Exp_11$ymax = Exp_11$avg + Exp_11$SE
+Exp_11$type = "Drug"
 
 
 
 
 
+# plot of experiment group
+
+
+Exp_12 = Exp_11%>%
+  group_by(type)%>%
+ summarise(ymin = mean(Exp_11$ymin), ymax = mean(Exp_11$ymax), avg = mean(Exp_11$avg))
+
+ p <- ggplot(Exp_12, aes(x=type, y= avg)) + geom_boxplot()+geom_errorbar(aes(ymin= ymin, ymax=ymax), width=.1)+geom_point(aes(x=type, y=avg))
+ 
+ 
+ ggplot(Exp_11, aes(x=type, y=avg))+geom_bar()
+ 
+ 
+
+p = ggplot(Exp_12, aes(x=type, y=avg))+ geom_errorbar(aes(ymin= ymin, ymax=ymax), width=.1)
+ 
+ggplot(Exp_12, aes(x=type, y= avg)) + geom_points
+ 
+ 
+
+
+   ggplot(Exp_11,aes(x=type, y= avg))+geom_boxplot(color = "steelblue", size = .1, alpha=1/2) + geom_point()+geom_jitter()+ geom_errorbar(aes(ymin= ymin, ymax=ymax), width=.1)
+   
+   
+   
+   
+   +ggplot(Exp_12, aes(x=type, y=avg))+ geom_errorbar(aes(ymin= ymin, ymax=ymax), width=.1)+geom_point()
+
+q<- ggplot(Exp_12, aes(x=type, y=avg))+ geom_errorbar(aes(ymin= ymin, ymax=ymax), width=.1)+geom_point()
+q+ ggplot(Exp_11, aes(x=type, y=avg), width = 0.1)+geom_point()
 
 
 ```
@@ -630,7 +849,14 @@ Produces a line plot of peak tension as a percent variation from baseline tensio
 
 ```{r lineDatavisualization}
 
+library(ggplot2)
 
+ggplot(Exp, aes(x= ramp.num, y= pvb.BL.tension, color = Trial)) +
+    geom_point()+
+  geom_line()+
+  geom_smooth(method ="lm", se=FALSE, color = "black", aes (group = 1))+ 
+  ggtitle("Baseline Tension")+
+  theme(plot.title = element_text(hjust=0.5)) +scale_x_continuous("Time(Min.)")+scale_y_continuous("Percent varation from baseline")
 
 
 
