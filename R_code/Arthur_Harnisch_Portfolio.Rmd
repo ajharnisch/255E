@@ -75,6 +75,9 @@ Required packages: ggplot2, dplyr, splitstackshape.
 #grid
 #install.packages("grid")
 
+#xlsx
+#install.packages("xlsx")
+
 
 
 ```
@@ -962,9 +965,16 @@ ggplot(Exp_Con11, aes(x=num.type, y=avg.all.macro, group = num.type, color = Mac
     width=.25,position=position_dodge(.9))+
   geom_jitter()+
   facet_grid(type~.)
-  
-  
-  
+
+
+#side by side experiment and control scatter plot with wrror bars
+
+ggplot(Exp_Con11, aes(x=Exp_Con11$type, y=avg.all.macro, group = num.type, color = Macro))+
+  geom_point()+
+  geom_errorbar(aes(ymin=min1, ymax= max1), size=0.5,   
+    width=.25,position=position_dodge(.9))+
+  geom_jitter()
+ 
   
 
 ```
@@ -984,11 +994,11 @@ g <- rasterGrob(img, interpolate=TRUE)
   geom_point()+
    geom_line()+
  #annotation_custom(g, xmin=-Inf, xmax=Inf, ymin=min(Exp$pvb.BL.tension), ymax=Inf)
- annotation_custom(g, xmin=min(Exp$ramp.num), xmax=Inf, ymin=-Inf, ymax=Inf)+
+ annotation_custom(g, xmin=-Inf, xmax=Inf, ymin= max(Exp$pvb.BL.tension) , ymax=Inf)+
    ylim(min(Exp$pvb.BL.tension), 2)+
    geom_smooth(method ="lm", se=TRUE, color = "black", aes (group = 1))+
    theme_minimal()+
-    scale_x_continuous("Time(Min.)", breaks = round(seq(min(Exp$ramp.num), max(Exp$ramp.num), by=2),1))+
+    scale_x_continuous("Time(Min.)", breaks = round(seq(min = maxExp$ramp.num, max(Exp$ramp.num), by=2),1))+
   theme(axis.text.x = element_text(angle = 90, hjust = 1))+
   scale_y_continuous("Percent Variation from Baseline", breaks = round(seq(min(Exp$pvb.BL.tension), max(Exp$pvb.BL.tension), by=0.01),1))
    
@@ -996,6 +1006,10 @@ g <- rasterGrob(img, interpolate=TRUE)
 
  
 
+ 
+ 
+ 
+ 
 ```
 ###Table Output
 
@@ -1003,13 +1017,42 @@ outputs a table for 10 sec. before static stretch (baseline tension), peak tensi
 
 ```{r tableOutput}
 
-#setwd("C:\\Users\\Arthur\\255E\\Tension_R\\Exp_output")
+library(xlsx)
+#install.packages("rJava")
+library(rJava)
+library(dplyr)
+#dataframe manipulation for output format
 
-#Exp 9 will be equal to the data frame that is being output to the folder. 
 
-#Exp9 = j#j in place currently untill data frame can be created
+#baseline tension 
 
-#write.csv(Exp9, file = "Exp_Output", append = FALSE, sep = ",", col.names = TRUE)
+Exp_20 =as.data.frame(Exp$BL.tension)
+Exp_20$Trial = Exp$Trial
+Exp_20$Macro = Exp$Macro
+Exp_BL.tension = Exp$BL.tension
+Exp_20$ramp.num = Exp$ramp.num
+
+library(reshape)
+
+
+
+
+Exp_19 = Exp_20 %>%
+  group_by(ramp.num)%>%
+  summarise(avg_BSL = mean(BL.tension), na.rm = TRUE)
+
+
+
+Exp12 = rbind()
+
+#write dataframe to excel sheet
+
+write.xlsx(Exp12, file = "C:\\Users\\Arthur\\255E\\Tension_R\\Exp_output\\Exp_out.xlsx", sheetName="Sheet1")
+
+
+
+
+
 ```
 
 
