@@ -57,6 +57,25 @@ Required packages: ggplot2, dplyr, splitstackshape.
 #tidyr
 #install.packages("tidyr")# did not use but thought helpful
 
+#png
+#install.packages("png")# did not use but thought helpful
+
+#magick
+#install.packages("magick")#didn't uses
+
+#here
+#install.packages("here")#didn't use
+
+#magrittr
+#install.packages("magrittr")#didn't use
+
+#read JPGE
+#install.packages("jpeg")
+
+#grid
+#install.packages("grid")
+
+
 
 ```
 ###Importing data
@@ -351,8 +370,29 @@ con3 = con1 %>%
  
 Control$ramp.num = Control5$.id
 
-#library(reshape)
-#Exp7 = cast(Exp, ramp.num~Trial, value = "average.of.all.interval.points")
+
+
+
+#subsetting data frame to add categorical variable
+
+
+
+
+Macro_cat_var = levels = c('Macro 1 Ramp #1 46 sec', '#2 250-254 sec','#3 454-458 sec','#4 657-661 sec',"#5 861-865sec","#6 1065 - 1069 sec","Macro 2 Ramp #1 1115 sec", '#2 1319-1323 sec','#3 1523-1527 sec',' #4 1727-1731 sec','#5 1931- 1935 sec','#6 2135-2139 sec','Macro 3 Ramp #1 2185 sec','#2 2389-2393 sec','#3 2593-2597 sec','#4 2797 -2801 sec','#5 3001-3005 sec','#6 3205-3209 sec', 'Macro 4 Ramp #1 3255 sec','#2 3459-3463 sec','#3 3662-3667 sec','#4 3867-3871 sec','#5 4071-4075 sec.','#6 4275-4279 sec','Macro 5 Ramp #1 4325 sec','#2 4529-4533 sec','#3 4733-4737','#4 4937-4941 sec','#5 5141-5145 sec','#6 5345-5349 sec','Macro 6 Ramp #1 5395 sec','#2 5599-5603 sec','#3 5803-5807 sec','#4 6007-6011 sec.','#5 6211-6215 sec.','#6 6415-6419 sec','Macro 7 Ramp #1 6465 sec','#2 6669-6673 sec.','#3 6873-6877 sec.','#4 7077-7081 sec.','#5 7281-7285 sec.','#6 7485-7489 sec')
+
+
+
+Macro_cat_var = levels = c('1_1 46-50 sec', '1_2 250-254 sec','1_3 454-458 sec','1_4 657-661 sec',"1_5 861-865sec","1_6 1065 - 1069 sec","2_1 1115 sec", '2_2 1319-1323 sec','2_3 1523-1527 sec','2_4 1727-1731 sec','2_5 1931- 1935 sec','2_6 2135-2139 sec','3_1 2185-2189 sec','3_2 2389-2393 sec','3_3 2593-2597 sec','3_4 2797 -2801 sec','3_5 3001-3005 sec','3_6 3205-3209 sec', '4_1 3255-3259 sec','4_2 3459-3463 sec','4_3 3662-3667 sec','4_4 3867-3871 sec','4_5 4071-4075 sec.','4_6 4275-4279 sec','5_1 4325 sec','5_2 4529-4533 sec','5_3 4733-4737','5_4 4937-4941 sec','5_5 5141-5145 sec','5_6 5345-5349 sec','6_1 5395-5399 sec','6_2 5599-5603 sec','6_3 5803-5807 sec','6_4 6007-6011 sec.','6_5 6211-6215 sec.','6_6 6415-6419 sec','7_1 6465-6469 sec','7_2 6669-6673 sec.','7_3 6873-6877 sec.','7_4 7077-7081 sec.','7_5 7281-7285 sec.','7_6 7485-7489 sec')
+
+Macro_cat_var1 = as.data.frame(Macro_cat_var)
+Macro_cat_var1$id = 1:length(Macro_cat_var)
+
+#Exp$Macro_cat_var1 = Macro_cat_var1$Macro_cat_var[match(Exp$ramp.num, Macro_cat_var1$id)]
+
+
+
+
+
  
 ``` 
 ###Combination line plot
@@ -362,19 +402,26 @@ Control$ramp.num = Control5$.id
 ```{r CombinationLineplot}
 
 
+library(ggplot2)
+
+
 #graphs for Experiment group
 
 #plot of baseline tension over time and will display each graph individually for Experiment group
 
-library(ggplot2)
+#Baseline tension
 
 ggplot(Exp, aes(x= ramp.num, y= pvb.BL.tension, color = Trial)) +
     geom_point()+
   geom_line()+
   geom_smooth(method ="lm", se=FALSE, color = "black", aes (group = 1))+ 
   ggtitle("Baseline Tension")+
-  theme(plot.title = element_text(hjust=0.5)) +scale_x_continuous("Time(Min.)")+scale_y_continuous("Percent varation from baseline")
-
+  theme(plot.title = element_text(hjust=0.5)) +
+  scale_x_continuous("Time(Min.)", breaks = round(seq(min(Exp$ramp.num), max(Exp$ramp.num), by=2),1))+
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))+
+  scale_y_continuous("Percent varation from baseline",  breaks = round(seq(min(Exp$pvb.BL.tension), max(Exp$pvb.BL.tension), by = 0.1),1)) 
+  
+  
 
 #plot of peak tension
 
@@ -383,7 +430,11 @@ ggplot(Exp, aes(x = ramp.num, y=pvb.peak.tension, color = Trial)) +
   geom_line()+
   geom_smooth(method ="lm", se=FALSE, color = "black", aes (group = 1))+
   ggtitle("Peak Tension")+
-theme(plot.title = element_text(hjust=0.5))+scale_x_continuous("Time(Min.)")+scale_y_continuous("Percent varation from baseline")
+theme(plot.title = element_text(hjust=0.5))+
+  scale_x_continuous("Time(Min.)", breaks = round(seq(min(Exp$ramp.num), max(Exp$ramp.num), by=2),1))+
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))+
+  scale_y_continuous("Percent varation from baseline", breaks = round(seq(min(Exp$pvb.peak.tension), max(Exp$pvb.peak.tension), by = 1.2),1))
+
 
 
 #plot of peak plateu 3.25-3.75
@@ -393,8 +444,10 @@ ggplot(Exp, aes(x=ramp.num, y=pvb.SR, color= Trial))+
   geom_line()+
   geom_smooth(method ="lm", se=FALSE, color = "black", aes (group = 1))+
   ggtitle("SR") +
-  theme(plot.title = element_text(hjust=0.5))+scale_x_continuous("Time(Min.)")+scale_y_continuous("Percent varation from baseline")
-
+  theme(plot.title = element_text(hjust=0.5))+
+  scale_x_continuous("Time(Min.)",breaks = round(seq(min(Exp$ramp.num), max(Exp$ramp.num), by=2),1))+
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))+
+  scale_y_continuous("Percent varation from baseline", breaks = round(seq(min(Exp$pvb.SR), max(Exp$pvb.SR), by = 0.8),1))
 
 
 #plot of min tension
@@ -404,19 +457,26 @@ ggplot(Exp, aes(x=ramp.num, y=pvb.min, color = Trial))+
   geom_line()+
   geom_smooth(method ="lm", se=FALSE, color = "black", aes (group = 1)) +
   ggtitle("Minimum")+
-  theme(plot.title = element_text(hjust=0.5))+scale_x_continuous("Time(Min.)")+scale_y_continuous("Percent varation from baseline")
-
+  theme(plot.title = element_text(hjust=0.5))+
+   scale_x_continuous("Time(Min.)", breaks = round(seq(min(Exp$ramp.num), max(Exp$ramp.num), by=2),1))+
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))+
+  scale_y_continuous("Percent varation from baseline", breaks = round(seq(min(Exp$pvb.min), max(Exp$pvb.min), by = 2),1))
 
 
 #plot of graphs for control group
 
 
+#BL.Tension
+
 ggplot(Control, aes(x= ramp.num, y= pvb.BL.tension, color = Trial)) +
     geom_point()+
      geom_line()+
   geom_smooth(method ="lm", se=FALSE, color = "black", aes (group = 1))+
-  ggtitle("Baseline Tension")+
-  theme(plot.title = element_text(hjust=0.5))+scale_x_continuous("Time(Min.)")+scale_y_continuous("Percent varation from baseline")
+  ggtitle("Control Baseline Tension")+
+  theme(plot.title = element_text(hjust=0.5))+scale_x_continuous("Time(Min.)")+
+   scale_x_continuous("Time(Min.)", breaks = round(seq(min(Control$ramp.num), max(Control$ramp.num), by=2),1))+
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))+
+  scale_y_continuous("Percent varation from baseline",  breaks = round(seq(min(Control$pvb.BL.tension), max(Control$pvb.BL.tension), by = 0.1),1)) 
 
 
 
@@ -426,9 +486,11 @@ ggplot(Control, aes(x = ramp.num, y=pvb.peak.tension, color = Trial))+
     geom_point()+
   geom_line()+
   geom_smooth(method ="lm", se=FALSE, color = "black", aes (group = 1))+
-ggtitle("control Peak Tension")+
-  theme(plot.title = element_text(hjust=0.5))+scale_x_continuous("Time(Min.)")+scale_y_continuous("Percent varation from baseline")
-
+ggtitle("Control Peak Tension")+
+  theme(plot.title = element_text(hjust=0.5))+
+  scale_x_continuous("Time(Min.)", breaks = round(seq(min(Control$ramp.num), max(Control$ramp.num), by=2),1))+
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))+
+  scale_y_continuous("Percent varation from baseline", breaks = round(seq(min(Control$pvb.peak.tension), max(Control$pvb.peak.tension), by = 1.2),1)) 
 
 
 #plot of peak plateu 3.25-3.75
@@ -438,9 +500,10 @@ ggplot(Control, aes(x=ramp.num, y=pvb.SR, color= Trial))+
   geom_line()+
   geom_smooth(method ="lm", se=FALSE, color = "black", aes (group = 1)) +
   ggtitle("Control SR")+
-  theme(plot.title = element_text(hjust=0.5))+scale_x_continuous("Time(Min.)")+scale_y_continuous("Percent varation from baseline")
-
-
+  theme(plot.title = element_text(hjust=0.5))+
+  scale_x_continuous("Time(Min.)",breaks = round(seq(min(Control$ramp.num), max(Control$ramp.num), by=2),1))+
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))+
+  scale_y_continuous("Percent varation from baseline", breaks = round(seq(min(Control$pvb.SR), max(Control$pvb.SR), by = 0.8),1))
 
 #plot of min tension
 
@@ -450,15 +513,11 @@ ggplot(Control, aes(x=ramp.num, y=pvb.min, color = Trial))+
   geom_smooth(method ="lm", se=FALSE, color = "black", aes (group = 1))+
   ggtitle("Control Minimum")+
   theme(plot.title = element_text(hjust=0.5))+
-  scale_x_continuous("Time(Min.)")+
-  scale_y_continuous("Percent varation from baseline")
+  scale_x_continuous("Time(Min.)", breaks = round(seq(min(Control$ramp.num), max(Control$ramp.num), by=2),1))+
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))+
+  scale_y_continuous("Percent varation from baseline", breaks = round(seq(min(Control$pvb.min), max(Control$pvb.min), by = 2),1))
+  
 
-
-
-
-
-
-#test 
 
 ```
 
@@ -527,28 +586,62 @@ multiplot <- function(..., plotlist=NULL, file, cols=1, layout=NULL) {
 
 library(ggplot2)
 
-a1 = ggplot(Exp, aes(x= ramp.num, y= pvb.BL.tension, color = Trial)) +geom_line()+ ggtitle("Baseline Tension")+theme(plot.title = element_text(hjust=0.5)) +scale_x_continuous("Time(Min.)")+scale_y_continuous("Percent varation from baseline")+theme(legend.position = "none")
+
+#Baseline tension
+
+a1 = ggplot(Exp, aes(x= ramp.num, y= pvb.BL.tension, color = Trial)) +
+    geom_point()+
+  geom_line()+
+  geom_smooth(method ="lm", se=FALSE, color = "black", aes (group = 1))+ 
+  ggtitle("Baseline Tension")+
+  theme(plot.title = element_text(hjust=0.5)) +
+  scale_x_continuous("Time(Min.)", breaks = round(seq(min(Exp$ramp.num), max(Exp$ramp.num), by=2),1))+
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))+
+  scale_y_continuous("Percent varation from baseline",  breaks = round(seq(min(Exp$pvb.BL.tension), max(Exp$pvb.BL.tension), by = 0.1),1))+
+  theme(legend.position = "none")
 
 
 #plot of peak tension
 
-b1 =ggplot(Exp, aes(x = ramp.num, y=pvb.peak.tension, color = Trial)) +geom_line()+ggtitle("Peak Tension")+
-theme(plot.title = element_text(hjust=0.5))+scale_x_continuous("Time(Min.)")+scale_y_continuous("Percent varation from baseline")+theme(legend.position = "none")
+b1 = ggplot(Exp, aes(x = ramp.num, y=pvb.peak.tension, color = Trial)) +
+    geom_point()+
+  geom_line()+
+  geom_smooth(method ="lm", se=FALSE, color = "black", aes (group = 1))+
+  ggtitle("Peak Tension")+
+theme(plot.title = element_text(hjust=0.5))+
+  scale_x_continuous("Time(Min.)", breaks = round(seq(min(Exp$ramp.num), max(Exp$ramp.num), by=2),1))+
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))+
+  scale_y_continuous("Percent varation from baseline", breaks = round(seq(min(Exp$pvb.peak.tension), max(Exp$pvb.peak.tension), by = 1.2),1))+theme(legend.position = "none")
+
 
 
 #plot of peak plateu 3.25-3.75
 
-c1 =ggplot(Exp, aes(x=ramp.num, y=pvb.SR, color= Trial))+geom_line() +ggtitle("SR") +
-  theme(plot.title = element_text(hjust=0.5))+scale_x_continuous("Time(Min.)")+scale_y_continuous("Percent varation from baseline")+theme(legend.position = "none")
+c1 = ggplot(Exp, aes(x=ramp.num, y=pvb.SR, color= Trial))+
+    geom_point()+
+  geom_line()+
+  geom_smooth(method ="lm", se=FALSE, color = "black", aes (group = 1))+
+  ggtitle("SR") +
+  theme(plot.title = element_text(hjust=0.5))+
+  scale_x_continuous("Time(Min.)",breaks = round(seq(min(Exp$ramp.num), max(Exp$ramp.num), by=2),1))+
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))+
+  scale_y_continuous("Percent varation from baseline", breaks = round(seq(min(Exp$pvb.SR), max(Exp$pvb.SR), by = 0.8),1))+theme(legend.position = "none")
 
 
 #plot of min tension
 
-d1 =ggplot(Exp, aes(x=ramp.num, y=pvb.min, color = Trial))+geom_line() +ggtitle("Minimum")+
-  theme(plot.title = element_text(hjust=0.5))+scale_x_continuous("Time(Min.)")+scale_y_continuous("Percent varation from baseline")
+d1 = ggplot(Exp, aes(x=ramp.num, y=pvb.min, color = Trial))+
+    geom_point()+
+  geom_line()+
+  geom_smooth(method ="lm", se=FALSE, color = "black", aes (group = 1)) +
+  ggtitle("Minimum")+
+  theme(plot.title = element_text(hjust=0.5))+
+   scale_x_continuous("Time(Min.)", breaks = round(seq(min(Exp$ramp.num), max(Exp$ramp.num), by=2),1))+
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))+
+  scale_y_continuous("Percent varation from baseline", breaks = round(seq(min(Exp$pvb.min), max(Exp$pvb.min), by = 2),1))
 
 
-
+  
 
 #use the multiplot function to combine all plots in multiplot function
 
@@ -560,85 +653,69 @@ multiplot(a1,b1,c1,d1, cols=2)
 
 #creating labels for control plot 
 
-a_2 = ggplot(Control, aes(x= ramp.num, y= pvb.BL.tension, color = Trial)) +geom_line() +ggtitle("Control Baseline Tension")+
-  theme(plot.title = element_text(hjust=0.5))+theme(legend.position = "none")+
-scale_x_continuous("Time(Min.)")+scale_y_continuous("Percent varation from baseline")+theme(legend.position = "none")
+a_2 = ggplot(Control, aes(x= ramp.num, y= pvb.BL.tension, color = Trial)) +
+    geom_point()+
+     geom_line()+
+  geom_smooth(method ="lm", se=FALSE, color = "black", aes (group = 1))+
+  ggtitle("Control Baseline Tension")+
+  theme(plot.title = element_text(hjust=0.5))+scale_x_continuous("Time(Min.)")+
+   scale_x_continuous("Time(Min.)", breaks = round(seq(min(Control$ramp.num), max(Control$ramp.num), by=2),1))+
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))+
+  scale_y_continuous("Percent varation from baseline",  breaks = round(seq(min(Control$pvb.BL.tension), max(Control$pvb.BL.tension), by = 0.1),1)) +theme(legend.position = "none")
 
 
 #plot of peak tension
 
-b_2 = ggplot(Control, aes(x = ramp.num, y=pvb.peak.tension, color = Trial)) +geom_line()+ggtitle("Control Peak Tension")+
+b_2 = ggplot(Control, aes(x = ramp.num, y=pvb.peak.tension, color = Trial))+
+    geom_point()+
+  geom_line()+
+  geom_smooth(method ="lm", se=FALSE, color = "black", aes (group = 1))+
+ggtitle("Control Peak Tension")+
   theme(plot.title = element_text(hjust=0.5))+
-  scale_x_continuous("Time(Min.)")+scale_y_continuous("Percent varation from baseline")+theme(legend.position = "none")
+  scale_x_continuous("Time(Min.)", breaks = round(seq(min(Control$ramp.num), max(Control$ramp.num), by=2),1))+
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))+
+  scale_y_continuous("Percent varation from baseline", breaks = round(seq(min(Control$pvb.peak.tension), max(Control$pvb.peak.tension), by = 1.2),1)) +theme(legend.position = "none")
+
 
 
 #plot of peak plateu 3.25-3.75
 
-c_2 = ggplot(Control, aes(x=ramp.num, y=pvb.SR, color= Trial))+geom_line() +ggtitle("Control SR")+
+c_2 = ggplot(Control, aes(x=ramp.num, y=pvb.SR, color= Trial))+  
+  geom_point()+
+  geom_line()+
+  geom_smooth(method ="lm", se=FALSE, color = "black", aes (group = 1)) +
+  ggtitle("Control SR")+
   theme(plot.title = element_text(hjust=0.5))+
-  scale_x_continuous("Time(Min.)")+scale_y_continuous("Percent varation from baseline")+theme(legend.position = "none")
-#plot of min tension
-
-d_2 = ggplot(Control, aes(x=ramp.num, y=pvb.min, color = Trial))+geom_line() +ggtitle("Control Minimum")+
-  theme(plot.title = element_text(hjust=0.5))+scale_x_continuous("Time(Min.)")+scale_x_continuous("Time(Min.)")+scale_y_continuous("Percent varation from baseline")
-
-
-multiplot(a_2,b_2,c_2,d_2, cols = 2)
-
-
-
-#creates plots comparing treatment to control
-
-
-
-#plot of graphs for control group
-
-a_1 = ggplot(Exp, aes(x= ramp.num, y= pvb.BL.tension, color = Trial)) +geom_line()+ ggtitle("Baseline Tension")+theme(plot.title = element_text(hjust=0.5)) +theme(legend.position = "none")+labs(x = NULL, y=NULL)
-
-
-#plot of peak tension
-
-b_1 =ggplot(Exp, aes(x = ramp.num, y=pvb.peak.tension, color = Trial)) +geom_line()+ggtitle("Peak Tension")+
-theme(plot.title = element_text(hjust=0.5))+theme(legend.position = "none")+labs(x = NULL, y=NULL)
-
-
-#plot of peak plateu 3.25-3.75
-
-c_1 =ggplot(Exp, aes(x=ramp.num, y=pvb.SR, color= Trial))+geom_line() +ggtitle("SR") +
-  theme(plot.title = element_text(hjust=0.5))+theme(legend.position = "none")+labs(x = NULL, y=NULL)
-
+  scale_x_continuous("Time(Min.)",breaks = round(seq(min(Control$ramp.num), max(Control$ramp.num), by=2),1))+
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))+
+  scale_y_continuous("Percent varation from baseline", breaks = round(seq(min(Control$pvb.SR), max(Control$pvb.SR), by = 0.8),1))+theme(legend.position = "none")
 
 #plot of min tension
 
-d_3 =ggplot(Exp, aes(x=ramp.num, y=pvb.min, color = Trial))+geom_line() +ggtitle("Minimum")+
-  theme(plot.title = element_text(hjust=0.5))+scale_x_continuous("Time(Min.)")+theme(legend.position = "none")+labs(y=NULL)
+d_2 = ggplot(Control, aes(x=ramp.num, y=pvb.min, color = Trial))+
+  geom_point()+
+  geom_line()+
+  geom_smooth(method ="lm", se=FALSE, color = "black", aes (group = 1))+
+  ggtitle("Control Minimum")+
+  theme(plot.title = element_text(hjust=0.5))+
+  scale_x_continuous("Time(Min.)", breaks = round(seq(min(Control$ramp.num), max(Control$ramp.num), by=2),1))+
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))+
+  scale_y_continuous("Percent varation from baseline", breaks = round(seq(min(Control$pvb.min), max(Control$pvb.min), by = 2),1))
 
 
 
-a2 = ggplot(Control, aes(x= ramp.num, y= pvb.BL.tension, color = Trial)) +geom_line() +ggtitle("Control Baseline Tension")+
-  theme(plot.title = element_text(hjust=0.5))+theme(legend.position = "none")+labs(x = NULL, y=NULL)
 
 
 
-#plot of peak tension
-
-b2 = ggplot(Control, aes(x = ramp.num, y=pvb.peak.tension, color = Trial)) +geom_line()+ggtitle("Control Peak Tension")+
-  theme(plot.title = element_text(hjust=0.5))+theme(legend.position = "none")+labs(x = NULL, y=NULL)
-
-
-#plot of peak plateu 3.25-3.75
-
-c2 = ggplot(Control, aes(x=ramp.num, y=pvb.SR, color= Trial))+geom_line() +ggtitle("Control SR")+
-  theme(plot.title = element_text(hjust=0.5))+theme(legend.position = "none")+labs(x = NULL, y=NULL)
-
-#plot of min tension
-
-d2 = ggplot(Control, aes(x=ramp.num, y=pvb.min, color = Trial))+geom_line() +ggtitle("Control Minimum")+
-  theme(plot.title = element_text(hjust=0.5))+scale_x_continuous("Time(Min.)")+theme(legend.position = "none")+labs(y=NULL)
+  multiplot(a_2,b_2,c_2,d_2, cols = 2)
 
 
 
-multiplot(a2, b2, c2, d2,a_1,b_1, c_1,d_3, cols =2)
+#creates two columns to compare treatment and control
+
+#creates facet of multiple graphs comparing treatment to control
+
+#multiplot(a1,b1,c1,d1,a_2,b_2,c_2,d_2, cols =2)
 
 
 
@@ -703,7 +780,7 @@ Con10 = as.data.frame(table(Exp$Macro))
  
     
     #binds data frame to compare treatment and control in plot
-     graph1 = rbind(Exp8, Con8)
+     Exp_Con = rbind(Exp8, Con8)
  
      
      
@@ -748,7 +825,7 @@ library(ggplot2)
     geom_point()
    
    
- #multiplot(z1,z2, cols = 1)  
+ multiplot(z1,z2, cols = 1)  
      
 # single graph comparing treatment and control
  
@@ -759,8 +836,6 @@ ggplot(graph1, aes(x=Macro, y=avg.all.macro, colour= type)) +
     ggtitle("Average SR versus Time for Treatment and Control\n")+
   theme(plot.title = element_text(hjust=0.5))+
   labs(x="Time\n", y = "Average SR\n")
-
-
 
 
 #faceting data to compare treatment and control
@@ -777,6 +852,11 @@ ggplot(Exp_Con, aes(x=Macro, y=avg.all.macro, group = type, color = type))+
 #theme(legend.position = "none")#+   #uncomment if you want to remove legend
 #expand_limits(y=0)#+   #if you want to change the limits of the y-axis, uncomment and set the scale for y axis
 labs(x="Time\n", y = "Average SR\n")
+ 
+ 
+
+
+
   
 ```
 ###Dot plots with mean and error bars
@@ -807,59 +887,114 @@ Exp_11$ymax = Exp_11$avg + Exp_11$SE
 Exp_11$type = "Drug"
 
 
+#plot of average for macro BL. Tension per macro scatter plot with errorbars Experiment 
 
 
 
-# plot of experiment group
+library(ggplot2)
+
+Exp8$num.type = 1
+Exp8$min1 = mean(Exp8$ymin)
+Exp8$max1 = mean(Exp8$ymax)
 
 
-Exp_12 = Exp_11%>%
-  group_by(type)%>%
- summarise(ymin = mean(Exp_11$ymin), ymax = mean(Exp_11$ymax), avg = mean(Exp_11$avg))
+   ggplot(Exp8,aes(x=num.type, y=avg.all.macro, group = type, color = Macro)) + 
+   geom_errorbar(aes(ymin=min1 , ymax=max1), width= 20) +
+   geom_point()+
+     geom_jitter()+
+     ggtitle("Average SR versus Time for Treatment Group\n")+
+  theme(plot.title = element_text(hjust=0.5))+
+  labs(x="Time\n", y = "Average SR\n")
+   
 
- p <- ggplot(Exp_12, aes(x=type, y= avg)) + geom_boxplot()+geom_errorbar(aes(ymin= ymin, ymax=ymax), width=.1)+geom_point(aes(x=type, y=avg))
- 
- 
- ggplot(Exp_11, aes(x=type, y=avg))+geom_bar()
- 
- 
+   
+#plot of average for macro Bl.Tension per macro scatterplot with errorbars Control    
 
-p = ggplot(Exp_12, aes(x=type, y=avg))+ geom_errorbar(aes(ymin= ymin, ymax=ymax), width=.1)
- 
-ggplot(Exp_12, aes(x=type, y= avg)) + geom_points
- 
- 
+   Con8$num.type = 1.1
+
+Con8$min1 = mean(Con8$ymin)
+Con8$max1 = mean(Con8$ymax)
 
 
-   ggplot(Exp_11,aes(x=type, y= avg))+geom_boxplot(color = "steelblue", size = .1, alpha=1/2) + geom_point()+geom_jitter()+ geom_errorbar(aes(ymin= ymin, ymax=ymax), width=.1)
+   ggplot(Con8,aes(x=num.type, y=avg.all.macro, group = type, color = Macro)) + 
+   geom_errorbar(aes(ymin=min1 , ymax=max1), width= 20) +
+   geom_point()+
+     geom_jitter()+
+     ggtitle("Average SR versus Time for Treatment Group\n")+
+  theme(plot.title = element_text(hjust=0.5))+
+  labs(x="Time\n", y = "Average SR\n")
+   
+
+   
+
+# plot comparing treatment and control scatter plots with errorbars. 
+
+      #for multiplot
+   b3=(ggplot(Con8,aes(x=num.type, y=avg.all.macro, group = type, color = Macro)) + 
+   geom_errorbar(aes(ymin=min1 , ymax=max1), width= 20) +
+   geom_point()+
+     geom_jitter()+
+     ggtitle("Average SR versus Time for Control Group\n")+
+  theme(plot.title = element_text(hjust=0.5))+
+  labs(x="Time\n", y = "Average SR\n"))
    
    
    
+      #for later multiplot
+  a3= (ggplot(Exp8,aes(x=num.type, y=avg.all.macro, group = type, color = Macro)) + 
+   geom_errorbar(aes(ymin=min1 , ymax=max1), width= 20) +
+   geom_point()+
+     geom_jitter()+
+     ggtitle("Average SR versus Time for Treatment Group\n")+
+  theme(plot.title = element_text(hjust=0.5))+
+  labs(x="Time\n", y = "Average SR\n"))
    
-   +ggplot(Exp_12, aes(x=type, y=avg))+ geom_errorbar(aes(ymin= ymin, ymax=ymax), width=.1)+geom_point()
+   multiplot(a3,b3)
+   
+   #combining treatment and control using facet
+   
+Exp_Con11 = rbind(Exp8,Con8)
 
-q<- ggplot(Exp_12, aes(x=type, y=avg))+ geom_errorbar(aes(ymin= ymin, ymax=ymax), width=.1)+geom_point()
-q+ ggplot(Exp_11, aes(x=type, y=avg), width = 0.1)+geom_point()
-
+ggplot(Exp_Con11, aes(x=num.type, y=avg.all.macro, group = num.type, color = Macro))+
+  #scale_colour_manual(values = c("steelblue", "darkblue"))+
+  geom_point()+
+  geom_errorbar(aes(ymin=min1, ymax= max1), size=0.5,   
+    width=.25,position=position_dodge(.9))+
+  geom_jitter()+
+  facet_grid(type~.)
+  
+  
+  
+  
 
 ```
+
 ###Line plot with data visulization and standard deviation
 
 Produces a line plot of peak tension as a percent variation from baseline tension over time of experiment. This graph also incudes a picture of the instentaneous firing frequency caused by the third static stretch from each 20 mintue period above thee title of the graph. The x-axis is a categorial variable that lists the interval for the 4 seconds of the static stretch and also lists the standard deviation at each 20 minute interval.
 
 ```{r lineDatavisualization}
 
-library(ggplot2)
+library(png)
+img <- readPNG("..\\Tension_R\\img\\img.png")
 
-ggplot(Exp, aes(x= ramp.num, y= pvb.BL.tension, color = Trial)) +
-    geom_point()+
-  geom_line()+
-  geom_smooth(method ="lm", se=FALSE, color = "black", aes (group = 1))+ 
-  ggtitle("Baseline Tension")+
-  theme(plot.title = element_text(hjust=0.5)) +scale_x_continuous("Time(Min.)")+scale_y_continuous("Percent varation from baseline")
+g <- rasterGrob(img, interpolate=TRUE) 
 
+ ggplot(Exp, aes(x= ramp.num, y= pvb.BL.tension, color = Trial))+
+  geom_point()+
+   geom_line()+
+ #annotation_custom(g, xmin=-Inf, xmax=Inf, ymin=min(Exp$pvb.BL.tension), ymax=Inf)
+ annotation_custom(g, xmin=min(Exp$ramp.num), xmax=Inf, ymin=-Inf, ymax=Inf)+
+   ylim(min(Exp$pvb.BL.tension), 2)+
+   geom_smooth(method ="lm", se=TRUE, color = "black", aes (group = 1))+
+   theme_minimal()+
+    scale_x_continuous("Time(Min.)", breaks = round(seq(min(Exp$ramp.num), max(Exp$ramp.num), by=2),1))+
+  theme(axis.text.x = element_text(angle = 90, hjust = 1))+
+  scale_y_continuous("Percent Variation from Baseline", breaks = round(seq(min(Exp$pvb.BL.tension), max(Exp$pvb.BL.tension), by=0.01),1))
+   
+ 
 
-
+ 
 
 ```
 ###Table Output
