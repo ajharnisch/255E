@@ -52,7 +52,7 @@ Required packages: ggplot2, dplyr, splitstackshape.
 #install.packages("reshape")
 
 #reshape2
-#install.packages("reshape2")# did not use but thought helpful
+#install.packages("reshape2")
 
 #tidyr
 #install.packages("tidyr")# did not use but thought helpful
@@ -1018,9 +1018,9 @@ outputs a table for 10 sec. before static stretch (baseline tension), peak tensi
 ```{r tableOutput}
 
 library(xlsx)
-#install.packages("rJava")
 library(rJava)
 library(dplyr)
+library(reshape2)
 #dataframe manipulation for output format
 
 
@@ -1032,8 +1032,8 @@ Exp_20$Macro = Exp$Macro
 Exp_BL.tension = Exp$BL.tension
 Exp_20$ramp.num = Exp$ramp.num
 
-library(reshape)
-
+Exp_19 = melt(Exp_20, id.vars=c('Trial', 'ramp.num', 'Exp$BL.tension'))
+dcast(Exp_19, Trial + Exp$BL.tension ~ ramp.num)
 
 
 
