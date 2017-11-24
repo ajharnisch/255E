@@ -987,6 +987,16 @@ Produces a line plot of peak tension as a percent variation from baseline tensio
 
 ```{r lineDatavisualization}
 
+#calculating standard deviation
+
+ Exp8_sd = Exp%>%
+  group_by(Macro)%>%
+  summarise(sd = sd(average.of.all.interval.points, na.rm = TRUE))
+
+Exp$sd = Exp8_sd$sd[match(Exp$Macro, Exp8_sd$Macro)]
+
+#graph with image
+
 library(png)
 img <- readPNG("..\\Tension_R\\img\\img.png")
 
@@ -1000,12 +1010,12 @@ g <- rasterGrob(img, interpolate=TRUE, height = 1, width = 1) #chnage height and
   ggtitle("Baseline Tension")+
   theme(plot.title = element_text(hjust=0.5)) +
   scale_x_continuous("Time(Min.)", breaks = round(seq(min(Exp$ramp.num), max(Exp$ramp.num), by=2),1))+
-  theme(axis.text.x = element_text(angle = 45, hjust = 1))+
+   theme(axis.text.x = element_text(angle = 45, hjust = 1))+
   scale_y_continuous("Percent varation from baseline",  breaks = round(seq(min(Exp$pvb.BL.tension), max(Exp$pvb.BL.tension), by = 0.1),1))+
-    expand_limits(y=1.7)#adjust y-limit
+    expand_limits(y=1.7)
    
-  
- 
+    
+   
 
  
 ```
