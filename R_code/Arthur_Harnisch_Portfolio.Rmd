@@ -392,7 +392,7 @@ Macro_cat_var1$id = 1:length(Macro_cat_var)
 
 #Exp$Macro_cat_var1 = Macro_cat_var1$Macro_cat_var[match(Exp$ramp.num, Macro_cat_var1$id)]
 
-
+# res = filter(Exp1, Macro == 1, Ramp.. <7)   #dplyr filter 
 
 
 
@@ -509,6 +509,8 @@ ggplot(Control, aes(x=ramp.num, y=pvb.SR, color= Trial))+
   scale_y_continuous("Percent varation from baseline", breaks = round(seq(min(Control$pvb.SR), max(Control$pvb.SR), by = 0.8),1))
 
 #plot of min tension
+
+library(ggplot2)
 
 ggplot(Control, aes(x=ramp.num, y=pvb.min, color = Trial))+
   geom_point()+
@@ -832,13 +834,13 @@ library(ggplot2)
      
 # single graph comparing treatment and control
  
-ggplot(graph1, aes(x=Macro, y=avg.all.macro, colour= type)) + 
-   geom_errorbar(aes(ymin= ymin, ymax=ymax), width=.1) +
+ggplot(Exp_Con, aes(x=Macro, y=avg.all.macro, colour= type)) + 
+  geom_errorbar(aes(ymin= ymin, ymax=ymax), width=.1) +
     geom_line() +
     geom_point()+
     ggtitle("Average SR versus Time for Treatment and Control\n")+
-  theme(plot.title = element_text(hjust=0.5))+
-  labs(x="Time\n", y = "Average SR\n")
+ theme(plot.title = element_text(hjust=0.5))+
+ labs(x="Time\n", y = "Average SR\n")
 
 
 #faceting data to compare treatment and control
@@ -988,27 +990,23 @@ Produces a line plot of peak tension as a percent variation from baseline tensio
 library(png)
 img <- readPNG("..\\Tension_R\\img\\img.png")
 
-g <- rasterGrob(img, interpolate=TRUE) 
+g <- rasterGrob(img, interpolate=TRUE, height = 1, width = 1) #chnage height and width of the image 
 
- ggplot(Exp, aes(x= ramp.num, y= pvb.BL.tension, color = Trial))+
-  geom_point()+
-   geom_line()+
- #annotation_custom(g, xmin=-Inf, xmax=Inf, ymin=min(Exp$pvb.BL.tension), ymax=Inf)
- annotation_custom(g, xmin=-Inf, xmax=Inf, ymin= max(Exp$pvb.BL.tension) , ymax=Inf)+
-   ylim(min(Exp$pvb.BL.tension), 2)+
-   geom_smooth(method ="lm", se=TRUE, color = "black", aes (group = 1))+
-   theme_minimal()+
-    scale_x_continuous("Time(Min.)", breaks = round(seq(min = maxExp$ramp.num, max(Exp$ramp.num), by=2),1))+
-  theme(axis.text.x = element_text(angle = 90, hjust = 1))+
-  scale_y_continuous("Percent Variation from Baseline", breaks = round(seq(min(Exp$pvb.BL.tension), max(Exp$pvb.BL.tension), by=0.01),1))
+  ggplot(Exp, aes(x= ramp.num, y= pvb.BL.tension, color = Trial)) +
+    geom_point()+
+  geom_line()+
+    annotation_custom(g, xmin=-Inf, xmax=Inf, ymin= max(Exp$pvb.BL.tension) , ymax=Inf)+
+  geom_smooth(method ="lm", se=FALSE, color = "black", aes (group = 1))+ 
+  ggtitle("Baseline Tension")+
+  theme(plot.title = element_text(hjust=0.5)) +
+  scale_x_continuous("Time(Min.)", breaks = round(seq(min(Exp$ramp.num), max(Exp$ramp.num), by=2),1))+
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))+
+  scale_y_continuous("Percent varation from baseline",  breaks = round(seq(min(Exp$pvb.BL.tension), max(Exp$pvb.BL.tension), by = 0.1),1))+
+    expand_limits(y=1.7)#adjust y-limit
    
+  
  
 
- 
-
- 
- 
- 
  
 ```
 ###Table Output
@@ -1021,36 +1019,49 @@ library(xlsx)
 library(rJava)
 library(dplyr)
 library(reshape2)
+library(reshape)
+
+
 #dataframe manipulation for output format
 
 
-#baseline tension 
 
-Exp_20 =as.data.frame(Exp$BL.tension)
-Exp_20$Trial = Exp$Trial
-Exp_20$Macro = Exp$Macro
-Exp_BL.tension = Exp$BL.tension
-Exp_20$ramp.num = Exp$ramp.num
+#reshape data baseline
 
-Exp_19 = melt(Exp_20, id.vars=c('Trial', 'ramp.num', 'Exp$BL.tension'))
-dcast(Exp_19, Trial + Exp$BL.tension ~ ramp.num)
+library(reshape)
+Exp_19 = cast(Exp, Trial~ramp.num, value = "BL.tension" )
+Exp_19$type = "BL.tension"
+Exp_19$type.num = "4"
 
 
+#reshape data peak tension
+Exp_21 = cast(Exp, Trial~ramp.num, value = "peak.tension")
+Exp_21$type = "peak.tension"
+Exp_21$type.num = "3"
 
-Exp_19 = Exp_20 %>%
-  group_by(ramp.num)%>%
-  summarise(avg_BSL = mean(BL.tension), na.rm = TRUE)
+#reshape data SR tension
+Exp_22 = cast(Exp, Trial~ramp.num, value = "average.of.all.interval.points")
+Exp_22$type = "average.of.all.interval.points"
+Exp_22$type.num = "2"
 
+#reshape data min tension 
 
+Exp_23 = cast(Exp, Trial~ramp.num, value = "Min.value")
+Exp_23$type = "Min.value"
+Exp_23$type.num = "1"
 
-Exp12 = rbind()
+Exp_24 = bind_rows(list(Exp_19, Exp_21, Exp_22, Exp_23))
+
+library(dplyr)
+
+Exp_25 = Exp_24%>%
+  arrange(Trial)
+
+ 
 
 #write dataframe to excel sheet
 
-write.xlsx(Exp12, file = "C:\\Users\\Arthur\\255E\\Tension_R\\Exp_output\\Exp_out.xlsx", sheetName="Sheet1")
-
-
-
+write.xlsx(Exp_25, file = "C:\\Users\\Arthur\\255E\\Tension_R\\Exp_output\\Exp_out.xlsx", sheetName="Sheet1")
 
 
 ```
