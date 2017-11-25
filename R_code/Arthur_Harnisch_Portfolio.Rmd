@@ -70,13 +70,15 @@ Required packages: ggplot2, dplyr, splitstackshape.
 #install.packages("magrittr")#didn't use
 
 #read JPGE
-#install.packages("jpeg")
+#install.packages("jpeg")#didn't use 
 
 #grid
 #install.packages("grid")
 
 #xlsx
 #install.packages("xlsx")
+#gridExtra
+#install.packages("gridExtra")
 
 
 
@@ -987,6 +989,10 @@ Produces a line plot of peak tension as a percent variation from baseline tensio
 
 ```{r lineDatavisualization}
 
+library(dplyr)
+library(png)
+library(ggplot2)
+library(grid)
 #calculating standard deviation
 
  Exp8_sd = Exp%>%
@@ -994,10 +1000,10 @@ Produces a line plot of peak tension as a percent variation from baseline tensio
   summarise(sd = sd(average.of.all.interval.points, na.rm = TRUE))
 
 Exp$sd = Exp8_sd$sd[match(Exp$Macro, Exp8_sd$Macro)]
+my.labels <- paste(Exp$ramp.num, "\n (", Exp$sd, "%)")
 
 #graph with image
 
-library(png)
 img <- readPNG("..\\Tension_R\\img\\img.png")
 
 g <- rasterGrob(img, interpolate=TRUE, height = 1, width = 1) #chnage height and width of the image 
@@ -1009,16 +1015,50 @@ g <- rasterGrob(img, interpolate=TRUE, height = 1, width = 1) #chnage height and
   geom_smooth(method ="lm", se=FALSE, color = "black", aes (group = 1))+ 
   ggtitle("Baseline Tension")+
   theme(plot.title = element_text(hjust=0.5)) +
-  scale_x_continuous("Time(Min.)", breaks = round(seq(min(Exp$ramp.num), max(Exp$ramp.num), by=2),1))+
+    scale_x_continuous("Time(Min.)", breaks = round(seq(min(Exp$ramp.num), max(Exp$ramp.num), by=2),1))+
    theme(axis.text.x = element_text(angle = 45, hjust = 1))+
   scale_y_continuous("Percent varation from baseline",  breaks = round(seq(min(Exp$pvb.BL.tension), max(Exp$pvb.BL.tension), by = 0.1),1))+
     expand_limits(y=1.7)
-   
     
+   
+  
+  #divides the standard deviation for each macro so it can be subsetted
+  w1 = Exp8_sd$sd[1]
+w2 = Exp8_sd$sd[2]
+w3 = Exp8_sd$sd[3]
+w4 = Exp8_sd$sd[4]
+w5 = Exp8_sd$sd[5]
+w6 = Exp8_sd$sd[6]
+w7 =Exp8_sd$sd[7]
+
+    
+  # until I can find a better way to do this, highlight the line below, you will copy and paste these values under the caption on line 1056
+    cat( w1, w2, w3, w4, w5, w6, w7, sep = "  ")
+    
+    
+ #graph with image and standard deviation 
+    
+    img <- readPNG("..\\Tension_R\\img\\img.png")
+
+g <- rasterGrob(img, interpolate=TRUE, height = 1, width = 1) #chnage height and width of the image 
+
+  ggplot(Exp, aes(x= ramp.num, y= pvb.BL.tension, color = Trial)) +
+    geom_point()+
+  geom_line()+
+    annotation_custom(g, xmin=-Inf, xmax=Inf, ymin= max(Exp$pvb.BL.tension) , ymax=Inf)+
+  geom_smooth(method ="lm", se=FALSE, color = "black", aes (group = 1))+ 
+  ggtitle("Baseline Tension")+
+  theme(plot.title = element_text(hjust=0.5)) +
+    scale_x_continuous("Time(Min.)", breaks = round(seq(min(Exp$ramp.num), max(Exp$ramp.num), by=2),1))+
+   theme(axis.text.x = element_text(angle = 45, hjust = 1))+
+  scale_y_continuous("Percent varation from baseline",  breaks = round(seq(min(Exp$pvb.BL.tension), max(Exp$pvb.BL.tension), by = 0.1),1))+
+    expand_limits(y=1.7)+
+   labs(caption = "Standard Deviation:6.663331  5.971332  6.484333  20.05963  6.174198  5.803291  9.505252") 
    
 
  
 ```
+
 ###Table Output
 
 outputs a table for 10 sec. before static stretch (baseline tension), peak tension, average tension 3.25-3.27 of 4 sec. static stretch, and minimum tension in an excel (xlsx) format of transposed values with calculated average for each of the 20 minute periods. 
