@@ -8,28 +8,30 @@ output: word_document
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
 ```
-Outline of R Code Function for Muscle Tension Analysis and Graphs
+###Outline of R Code Function for Muscle Tension Analysis and Graphs
 
-1. Produces a combination line plot (10 sec. before static stretch (baseline tension), peak tension, average tension 3.25-3.27 of 4 sec. static stretch, and minimum tension) that shows the percent variation from baseline (first 20 minutes of experiment) over time of the experiemnt and contains a legend for the date of each trial.
+Experiments are conducted as a repeated measure design. Treatment and control experiments were conducted as separate trials. Trials typically occur for 100 minutes, but may occur for more or less time depending on protocol and quality of the signal. A python code, "python tension.py" was used to gather data at the relevant time points for peak tension (highest point of static stretch), minimum tension (lowest point of static stretch), baseline tension (10 sec beofre static stretch), and SR ( average between 3.25-3.75 sec. of 4 sec static stretch) for every ramp (static stretch) throughout the experiment. The python out-put is .csv and the file name was saved as analyzed year, month, date, muscle number, and trial letter. Under the file directory in a folder entitled tension, four folders exist experiment, control, img, and experiment output.  Python.csv files were placed in experiment and control based on the type of trial, the image for the graph (point 6 below) placed in folder img entitled img (png file), and excel output will receive the excel output from the r codethat organizes baseline, peak, SR, and minimum tension values group for each trial on one sheet. The features of this r code are listed below.  
 
-2. Produces a plot of averages compared to time of experiment for multiple trials for average tension 3.25-3.75 of 4 sec. static stretch with error bars. 
+1. Imports multiple.csv files for both experiment and control and creates a data frame of all .csv files for each (Exp, and Control). The name of the file is used to organize the information within the data frame. 
 
-3. Produces two dot plots with mean error bars that compares percent variation from baseline (first 20 minutes of experiemnt) to average value for each 20 minutes of the experiment for both treatment and control trials. 
+2. Calculates the percent variation from baseline for Baseline, peak, SR, and minimum tension in seperate columns for experiment and control. 
 
-4. Produces a line plot of peak tension as a percent variation from baseline tension over time of experiment. This graph also incudes a picture of the instentaneous firing frequency caused by the third static stretch from each 20 mintue period above thee title of the graph. The x-axis is a categorial variable that lists the interval for the 4 seconds of the static stretch and also lists the standard deviation at each 20 minute interval.  
+3. Produces a combination line plot (10 sec. before static stretch (baseline tension), peak tension, average tension 3.25-3.27 of 4 sec. static stretch, and minimum tension) that shows the percent variation from baseline (first 20 minutes of experiment) over time of the experiment and contains a legend for the date of each trial. Each graph is produced independently as well as grouped multi-plots of treatment and control. 
 
-5. outputs a table for 10 sec. before static stretch (baseline tension), peak tension, average tension 3.25-3.27 of 4 sec. static stretch, and minimum tension in an excel (xlsx) format of transposed values with calculated average for each of the 20 minute periods.    
+4. Produces a line plot of averages compared to time of experiment for multiple trials for average tension 3.25-3.75 of 4 sec. static stretch with error bars. This code will produce a graph of averages for treatment and control, a single plot of averages with two lines with error bars for treatment and control, and both individual graphs of average treatment and control faceted together.  
 
+5. Produces graphs of dot plots with error bars of the average SR (3.25-3.75 of static stretch) per 20 minutes of the experiment for every trial. Graphs are produced independently for treatment and control, a multiplot that shows treatment and control, and a single graph that shows treatment and control.    
+
+6. Produces a line plot of peak tension as a percent variation from baseline tension over time of experiment. This graph also includes a picture of the afferent firing caused by the first static stretch. The caption of this graph lists the standard deviation values for each 20-minute period of the experiment. 
+
+7. outputs a table for 10 sec. before static stretch (baseline tension), peak tension, average tension 3.25-3.27 of 4 sec. static stretch, and minimum tension in an excel (xlsx) format. 
 note: 
-Input files for this code will be .csv files. 
 
-Experiments are conducted as a repeated measure design. Treatment and control experiments were conducted as seperate trials. Trials typically occur for 100 mintues. 
-
-Required packages: ggplot2, dplyr, splitstackshape. 
-
+Required packages: ggplot2, dplyr, splitstackshape, reshape, grid, png.
 
 
 ###Installing Packages
+this chunk lists packages that are required for the code to function. Some packages are listed as didn't use since they may be helpful if this code needs to be further developed. All of the items in this chunk are commented out so that the r markdown can knit.  
 ```{r packageInstall}
 # Packages necessary for this r code
 #sections are commented out so document can knit
@@ -58,7 +60,7 @@ Required packages: ggplot2, dplyr, splitstackshape.
 #install.packages("tidyr")# did not use but thought helpful
 
 #png
-#install.packages("png")# did not use but thought helpful
+#install.packages("png")
 
 #magick
 #install.packages("magick")#didn't uses
@@ -78,7 +80,7 @@ Required packages: ggplot2, dplyr, splitstackshape.
 #xlsx
 #install.packages("xlsx")
 #gridExtra
-#install.packages("gridExtra")
+#install.packages("gridExtra")# didn't use
 
 
 
@@ -397,12 +399,10 @@ Macro_cat_var1$id = 1:length(Macro_cat_var)
 # res = filter(Exp1, Macro == 1, Ramp.. <7)   #dplyr filter 
 
 
-
- 
 ``` 
 ###Combination line plot
 
- Produces a combination line plot (10 sec. before static stretch (baseline tension), peak tension, average tension 3.25-3.27 of 4 sec. static stretch, and minimum tension) that shows the percent variation from baseline (first 20 minutes of experiment) over time of the experiemnt and contains a legend for the date of each trial. This was accoomplished in two steps 1st chunk allows for individual plots to be created so that modifications can be made and second combining the plots. 
+ Produces a combination line plot (10 sec. before static stretch (baseline tension), peak tension, average tension 3.25-3.27 of 4 sec. static stretch, and minimum tension) that shows the percent variation from baseline (first 20 minutes of experiment) over time of the experiemnt and contains a legend for the date of each trial. Individual graphs are produced for baseline, peak, SR and minimum tension for both experiment and control.  
 
 ```{r CombinationLineplot}
 
@@ -528,6 +528,9 @@ ggplot(Control, aes(x=ramp.num, y=pvb.min, color = Trial))+
 
 ```
 
+### Multiple plot for multiple line plot
+
+Produces a multiplot for each combination line plot. Baseline tension, peak tension, average tension 3.25-3.27 of 4 sec. static stretch, and minimum tension) that shows the percent variation from baseline (first 20 minutes of experiment) over time of the experiment and contains a legend for the date of each trial. 
 ```{r combinationLineplot}
 
 #combining the individual plots so they can be compared
@@ -580,12 +583,6 @@ multiplot <- function(..., plotlist=NULL, file, cols=1, layout=NULL) {
     }
   }
 }
-
-
-
-
-
-
 
 
 
@@ -654,10 +651,6 @@ d1 = ggplot(Exp, aes(x=ramp.num, y=pvb.min, color = Trial))+
 
 multiplot(a1,b1,c1,d1, cols=2)
 
-
-
-
-
 #creating labels for control plot 
 
 a_2 = ggplot(Control, aes(x= ramp.num, y= pvb.BL.tension, color = Trial)) +
@@ -711,9 +704,6 @@ d_2 = ggplot(Control, aes(x=ramp.num, y=pvb.min, color = Trial))+
 
 
 
-
-
-
   multiplot(a_2,b_2,c_2,d_2, cols = 2)
 
 
@@ -729,7 +719,7 @@ d_2 = ggplot(Control, aes(x=ramp.num, y=pvb.min, color = Trial))+
 ```
 ###Plot of averages
 
-Produces a plot of averages compared to time of experiment for multiple trials for average tension 3.25-3.75 of 4 sec. static stretch with error bars. A plot will be generated for treatment, control, and for treatment and control.  
+ Produces a line plot of averages compared to time of experiment for multiple trials for average tension 3.25-3.75 of 4 sec. static stretch with error bars. This code will produce a graph of averages for treatment and control, a single plot of averages with two lines with error bars for treatment and control, and both individual graphs of average treatment and control faceted together.   
 
 ```{r plotAverages}
 
@@ -803,7 +793,9 @@ library(ggplot2)
     geom_point()+
        ggtitle("Average SR versus Time for Treatment Group\n")+
   theme(plot.title = element_text(hjust=0.5))+
-  labs(x="Time\n", y = "Average SR\n")
+  labs(x="Time\n", y = "Average SR\n")+
+        scale_x_continuous(breaks = round(seq(min(Con8$Macro), max(Con8$Macro), by=1),1))+
+  theme(axis.text.x = element_text(angle = 0, hjust = 1))
      
      
    
@@ -817,19 +809,32 @@ library(ggplot2)
     geom_point()+
        ggtitle("Average SR versus Time for Control Group\n")+
   theme(plot.title = element_text(hjust=0.5))+
-  labs(x="Time\n", y = "Average SR\n")
+  labs(x="Time\n", y = "Average SR\n")+
+        scale_x_continuous(breaks = round(seq(min(Con8$Macro), max(Con8$Macro), by=1),1))+
+  theme(axis.text.x = element_text(angle = 0, hjust = 1))
      
 # side by side plot of control and treatment 
    
     z1= ggplot(Exp8,aes(x=Macro, y=avg.all.macro, colour= type)) + 
    geom_errorbar(aes(ymin= ymin, ymax=ymax), width=.1) +
+       scale_colour_manual(values = "steelblue")+
     geom_line() +
-    geom_point()
-     
+    geom_point()+
+     ggtitle("Average SR versus Time for Treatment and Control\n")+
+      theme(plot.title = element_text(hjust=0.5))+
+         scale_x_continuous(breaks = round(seq(min(Con8$Macro), max(Con8$Macro), by=1),1))+
+  theme(axis.text.x = element_text(angle = 0, hjust = 1))+
+    theme(axis.title.x=element_blank(),
+        axis.text.x=element_blank(),
+        axis.ticks.x=element_blank())
+    
  z2=  ggplot(Con8, aes(x=Macro, y=avg.all.macro, colour= type)) + 
    geom_errorbar(aes(ymin= ymin, ymax=ymax), width=.1) +
+   scale_colour_manual(values = "green")+
     geom_line() +
-    geom_point()
+    geom_point()+
+   scale_x_continuous("Time(Min.)", breaks = round(seq(min(Con8$Macro), max(Con8$Macro), by=1),1))+
+  theme(axis.text.x = element_text(angle = 0, hjust = 1))
    
    
  multiplot(z1,z2, cols = 1)  
@@ -842,7 +847,9 @@ ggplot(Exp_Con, aes(x=Macro, y=avg.all.macro, colour= type)) +
     geom_point()+
     ggtitle("Average SR versus Time for Treatment and Control\n")+
  theme(plot.title = element_text(hjust=0.5))+
- labs(x="Time\n", y = "Average SR\n")
+ labs(x="Time\n", y = "Average SR\n")+
+     scale_x_continuous("Time(Min.)", breaks = round(seq(min(Exp_Con$Macro), max(Exp_Con$Macro), by=1),1))+
+  theme(axis.text.x = element_text(angle = 0, hjust = 1))
 
 
 #faceting data to compare treatment and control
@@ -858,7 +865,9 @@ ggplot(Exp_Con, aes(x=Macro, y=avg.all.macro, group = type, color = type))+
   theme(plot.title = element_text(hjust=0.5))+
 #theme(legend.position = "none")#+   #uncomment if you want to remove legend
 #expand_limits(y=0)#+   #if you want to change the limits of the y-axis, uncomment and set the scale for y axis
-labs(x="Time\n", y = "Average SR\n")
+labs(x="Time\n", y = "Average SR\n")+
+     scale_x_continuous(breaks = round(seq(min(Exp_Con$Macro), max(Exp_Con$Macro), by=1),1))+
+  theme(axis.text.x = element_text(angle = 0, hjust = 1))
  
  
 
@@ -866,9 +875,11 @@ labs(x="Time\n", y = "Average SR\n")
 
   
 ```
+
+
 ###Dot plots with mean and error bars
 
-Produces two dot plots with error bars that will compare the percent variation from baseline for both the treatment and control groups for baseline tension.  
+Produces graphs of dot plots with error bars of the average SR (3.25-3.75 of static stretch) per 20 minutes of the experiment for every trial. Graphs are produced independently for treatment and control, a multiplot that shows treatment and control, and a single graph that shows treatment and control.    
 
 
 ```{r dotPlot}
@@ -909,9 +920,13 @@ Exp8$max1 = mean(Exp8$ymax)
    geom_errorbar(aes(ymin=min1 , ymax=max1), width= 20) +
    geom_point()+
      geom_jitter()+
-     ggtitle("Average SR versus Time for Treatment Group\n")+
+     ggtitle("Average SR for Treatment Group\n")+
   theme(plot.title = element_text(hjust=0.5))+
-  labs(x="Time\n", y = "Average SR\n")
+  labs(x="Drug\n", y = "Average SR\n")+
+         theme(axis.text.x=element_blank(),
+        axis.ticks.x=element_blank())
+        
+   
    
 
    
@@ -927,9 +942,11 @@ Con8$max1 = mean(Con8$ymax)
    geom_errorbar(aes(ymin=min1 , ymax=max1), width= 20) +
    geom_point()+
      geom_jitter()+
-     ggtitle("Average SR versus Time for Treatment Group\n")+
+     ggtitle("Average SR for Control Group\n")+
   theme(plot.title = element_text(hjust=0.5))+
-  labs(x="Time\n", y = "Average SR\n")
+  labs(x="Type\n", y = "Average SR\n")+
+        theme(axis.text.x=element_blank(),
+        axis.ticks.x=element_blank())
    
 
    
@@ -941,9 +958,11 @@ Con8$max1 = mean(Con8$ymax)
    geom_errorbar(aes(ymin=min1 , ymax=max1), width= 20) +
    geom_point()+
      geom_jitter()+
-     ggtitle("Average SR versus Time for Control Group\n")+
+     ggtitle("Average SR for Control Group\n")+
   theme(plot.title = element_text(hjust=0.5))+
-  labs(x="Time\n", y = "Average SR\n"))
+  labs(x="Control\n", y = "Average SR\n"))+
+        theme(axis.text.x=element_blank(),
+        axis.ticks.x=element_blank())
    
    
    
@@ -954,7 +973,9 @@ Con8$max1 = mean(Con8$ymax)
      geom_jitter()+
      ggtitle("Average SR versus Time for Treatment Group\n")+
   theme(plot.title = element_text(hjust=0.5))+
-  labs(x="Time\n", y = "Average SR\n"))
+  labs(x="Drug\n", y = "Average SR\n"))+
+       theme(axis.text.x=element_blank(),
+        axis.ticks.x=element_blank())
    
    multiplot(a3,b3)
    
@@ -967,17 +988,27 @@ ggplot(Exp_Con11, aes(x=num.type, y=avg.all.macro, group = num.type, color = Mac
   geom_point()+
   geom_errorbar(aes(ymin=min1, ymax= max1), size=0.5,   
     width=.25,position=position_dodge(.9))+
+    theme(axis.title.x=element_blank(),
+        axis.text.x=element_blank(),
+        axis.ticks.x=element_blank())+
+#theme(axis.text.x = element_text(angle = 0, hjust = 1))+
   geom_jitter()+
-  facet_grid(type~.)
+  facet_grid(type~.)+
+  labs(x="Experiment type\n", y = "Average of all Macros\n")
 
 
 #side by side experiment and control scatter plot with wrror bars
 
-ggplot(Exp_Con11, aes(x=Exp_Con11$type, y=avg.all.macro, group = num.type, color = Macro))+
+ggplot(Exp_Con11, aes(x=Exp_Con11$type, y=avg.all.macro, group = num.type, color =Macro))+
   geom_point()+
   geom_errorbar(aes(ymin=min1, ymax= max1), size=0.5,   
     width=.25,position=position_dodge(.9))+
-  geom_jitter()
+  geom_jitter()+
+  ggtitle("Average SR for treatment and control")+
+  theme(plot.title = element_text(hjust=0.5))+
+  labs(x="Experiment type\n", y = "Average of all Macros\n")
+ 
+ 
  
   
 
@@ -985,7 +1016,7 @@ ggplot(Exp_Con11, aes(x=Exp_Con11$type, y=avg.all.macro, group = num.type, color
 
 ###Line plot with data visulization and standard deviation
 
-Produces a line plot of peak tension as a percent variation from baseline tension over time of experiment. This graph also incudes a picture of the instentaneous firing frequency caused by the third static stretch from each 20 mintue period above thee title of the graph. The x-axis is a categorial variable that lists the interval for the 4 seconds of the static stretch and also lists the standard deviation at each 20 minute interval.
+Produces a line plot of peak tension as a percent variation from baseline tension over time of experiment. This graph also includes a picture of the afferent firing caused by the first static stretch. The caption of this graph lists the standard deviation values for each 20-minute period of the experiment. 
 
 ```{r lineDatavisualization}
 
@@ -1032,7 +1063,7 @@ w6 = Exp8_sd$sd[6]
 w7 =Exp8_sd$sd[7]
 
     
-  # until I can find a better way to do this, highlight the line below, you will copy and paste these values under the caption on line 1056
+  # until I can find a better way to do this, highlight the line below, you will copy and paste these values under the caption on line 1086
     cat( w1, w2, w3, w4, w5, w6, w7, sep = "  ")
     
     
@@ -1053,7 +1084,7 @@ g <- rasterGrob(img, interpolate=TRUE, height = 1, width = 1) #chnage height and
    theme(axis.text.x = element_text(angle = 45, hjust = 1))+
   scale_y_continuous("Percent varation from baseline",  breaks = round(seq(min(Exp$pvb.BL.tension), max(Exp$pvb.BL.tension), by = 0.1),1))+
     expand_limits(y=1.7)+
-   labs(caption = "Standard Deviation:6.663331  5.971332  6.484333  20.05963  6.174198  5.803291  9.505252") 
+   labs(caption = "Standard Deviation: 6.663331  5.971332  6.484333  20.05963  6.174198  5.803291  9.505252") 
    
 
  
@@ -1112,6 +1143,15 @@ Exp_25 = Exp_24%>%
 #write dataframe to excel sheet
 
 write.xlsx(Exp_25, file = "C:\\Users\\Arthur\\255E\\Tension_R\\Exp_output\\Exp_out.xlsx", sheetName="Sheet1")
+
+
+
+
+#data frame manipulation
+
+#install.packages("htmlTable")
+
+#library(htmlTable)
 
 
 ```
