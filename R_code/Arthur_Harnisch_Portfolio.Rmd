@@ -1,7 +1,7 @@
 ---
 title: "Portfolio"
 author: "Arthur Harnisch"
-date: "November 15, 2017"
+date: "November 29, 2017"
 output: word_document
 ---
 
@@ -82,6 +82,9 @@ this chunk lists packages that are required for the code to function. Some packa
 
 #gridExtra
 #install.packages("gridExtra")# didn't use
+
+#htmlTable
+#install.packages("htmlTable")# didn't use
 
 
 
@@ -513,8 +516,6 @@ ggplot(Control, aes(x=ramp.num, y=pvb.SR, color= Trial))+
 
 #plot of min tension
 
-library(ggplot2)
-
 ggplot(Control, aes(x=ramp.num, y=pvb.min, color = Trial))+
   geom_point()+
   geom_line()+
@@ -525,6 +526,7 @@ ggplot(Control, aes(x=ramp.num, y=pvb.min, color = Trial))+
   theme(axis.text.x = element_text(angle = 45, hjust = 1))+
   scale_y_continuous("Percent varation from baseline", breaks = round(seq(min(Control$pvb.min), max(Control$pvb.min), by = 2),1))
   
+
 
 
 ```
@@ -1065,7 +1067,11 @@ w7 =Exp8_sd$sd[7]
 
     
   # until I can find a better way to do this, highlight the line below, you will copy and paste these values under the caption on line 1086
-    cat( w1, w2, w3, w4, w5, w6, w7, sep = "  ")
+
+   mysds = c( w1, w2, w3, w4, w5, w6, w7)
+   mysds = round(mysds, digits = 3)
+  # mysds2 = paste(sprintf(fmt ="%2.3f", mysds), collapse=' ')
+   #mysds2  = paste("Standard Deviation:",mysds2)
     
     
  #graph with image and standard deviation 
@@ -1085,8 +1091,13 @@ g <- rasterGrob(img, interpolate=TRUE, height = 1, width = 1) #chnage height and
    theme(axis.text.x = element_text(angle = 45, hjust = 1))+
   scale_y_continuous("Percent varation from baseline",  breaks = round(seq(min(Exp$pvb.BL.tension), max(Exp$pvb.BL.tension), by = 0.1),1))+
     expand_limits(y=1.7)+
-   labs(caption = "Standard Deviation: 6.663331  5.971332  6.484333  20.05963  6.174198  5.803291  9.505252") 
+   labs(caption = mysds2) 
    
+  
+  #annotate("text", x = seq(from = 6, to = max(x-axis), by = 6), y = , label = mysds)
+
+  
+  
 
  
 ```
