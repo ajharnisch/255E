@@ -1,7 +1,7 @@
 ---
 title: "Portfolio"
 author: "Arthur Harnisch"
-date: "November 29, 2017"
+date: "December 13, 2017"
 output: word_document
 ---
 
@@ -10,7 +10,8 @@ knitr::opts_chunk$set(echo = TRUE)
 ```
 ###Outline of R Code Function for Muscle Tension Analysis and Graphs
 
-Experiments are conducted as a repeated measure design. Treatment and control experiments were conducted as separate trials. Trials typically occur for 100 minutes, but may occur for more or less time depending on protocol and quality of the signal. A python code, "python tension.py" was used to gather data at the relevant time points for peak tension (highest point of static stretch), minimum tension (lowest point of static stretch), baseline tension (10 sec beofre static stretch), and SR ( average between 3.25-3.75 sec. of 4 sec static stretch) for every ramp (static stretch) throughout the experiment. The python out-put is .csv and the file name was saved as analyzed year, month, date, muscle number, and trial letter. Under the file directory in a folder entitled tension, four folders exist experiment, control, img, and experiment output.  Python.csv files were placed in experiment and control based on the type of trial, the image for the graph (point 6 below) placed in folder img entitled img (png file), and excel output will receive the excel output from the r codethat organizes baseline, peak, SR, and minimum tension values group for each trial on one sheet. The features of this r code are listed below.  
+Experiments are conducted as a repeated measure design. Treatment and control experiments were conducted as separate trials. Trials typically occur for 100 minutes, but may occur for more or less time depending on protocol and quality of 
+type Ia muscle spindle afferent firing. A python code, "python tension.py" was used to gather data at the relevant time points for peak tension (highest point of static stretch), minimum tension (lowest point of static stretch), baseline tension (10 sec beofre static stretch), and SR (average between 3.25-3.75 sec. of 4 sec static stretch) for every ramp (static stretch) throughout the experiment. The python out-put is .csv and the file name was saved as analyzed year, month, date, muscle number, and trial letter. Under the file directory in a folder entitled tension, four folders exist experiment, control, img, and experiment output.  Python.csv files were placed in experiment and control based on the type of trial, the image for the graph (point 6 below) placed in folder img entitled img (png file), and excel output will receive the excel output from the r codethat organizes baseline, peak, SR, and minimum tension values group for each trial on one sheet. The features of this r code are listed below.  
 
 1. Imports multiple.csv files for both experiment and control and creates a data frame of all .csv files for each (Exp, and Control). The name of the file is used to organize the information within the data frame. 
 
@@ -40,8 +41,7 @@ this chunk lists packages that are required for the code to function. Some packa
 
 #install.packages("ggplot2") #this command is commented out untill it becomes necessary to use. 
 
-#dataloader
-#install.packages("DataLoader")# did not use but thought helpful
+
 
 #dplyr
 #install.packages("dplyr")
@@ -56,23 +56,9 @@ this chunk lists packages that are required for the code to function. Some packa
 #reshape2
 #install.packages("reshape2")
 
-#tidyr
-#install.packages("tidyr")# did not use but thought helpful
 
 #png
 #install.packages("png")
-
-#magick
-#install.packages("magick")#didn't uses
-
-#here
-#install.packages("here")#didn't use
-
-#magrittr
-#install.packages("magrittr")#didn't use
-
-#read JPGE
-#install.packages("jpeg")#didn't use 
 
 #grid
 #install.packages("grid")
@@ -80,37 +66,20 @@ this chunk lists packages that are required for the code to function. Some packa
 #xlsx
 #install.packages("xlsx")
 
-#gridExtra
-#install.packages("gridExtra")# didn't use
-
-#htmlTable
-#install.packages("htmlTable")# didn't use
-
-
 
 ```
 ###Importing data
 
-A folder named Tension_R was created so that multiple .csv files could be placed into it and analyzed. In this folder there are two folders, Experiment and Control. .csv files from a drug trial are placed under experiment and control files are placed under control.   
+A folder named Tension_R was created so that multiple .csv files could be placed into it and analyzed. In this folder there are two folders, Experiment and Control. ".csv"" files from experiment, or control files are placed under appropriate folder.    
 
 ```{r dataImport}
 
+#multiple data import for experiment by use of for loop to find .csv files and rbind to single data frame for Experiment. 
 
-#load multiple.csv files
-
-#library(DataLoader)
-
-#temp = importCsv(path = "../Tension_R/Control")
-#list.filenames = list.files("../Tension_R/Control", pattern = "*.csv$")
-
-#will import multiple files from a path into one data frame only if the same length
-#library(DataLoader)
-#tem3 = importAllSdf(path = "../Tension_R/Control")
-
-#multiple data import for experiment by use of for loop to find .csv files and rbind. 
-
+#myfiles is a new data frame for all .csv files from Experiment folder 
 myfiles=dir("../Tension_R/Experiment", pattern = "*.csv$", all.files = TRUE, full.names = TRUE)
 
+#
 
 for(i in 1: length(myfiles) ){
   
@@ -153,6 +122,9 @@ for(i in 1: length(myfiles) ){
     Exp = rbind( Exp, temp2)
   }
 }
+
+
+
 
 
 
@@ -218,7 +190,7 @@ This code finds the percent variation from baseline for 10 sec. before static st
 
 ```{r dataManipulation_EXP}
 
-#calculates the percept variation from baseline for each of the trials and makes a seperate column to display the percent from variation 10 sec. before static stretch (baseline tension), peak tension, average tension 3.25-3.27 of 4 sec. static stretch, and minimum tension. 
+#calculates the percept change from baseline for each of the trials and makes a seperate column to display the percent from variation 10 sec. before static stretch (baseline tension), peak tension, average tension 3.25-3.27 of 4 sec. static stretch, and minimum tension. 
 
 
 
@@ -408,7 +380,7 @@ Macro_cat_var1$id = 1:length(Macro_cat_var)
 
  Produces a combination line plot (10 sec. before static stretch (baseline tension), peak tension, average tension 3.25-3.27 of 4 sec. static stretch, and minimum tension) that shows the percent variation from baseline (first 20 minutes of experiment) over time of the experiemnt and contains a legend for the date of each trial. Individual graphs are produced for baseline, peak, SR and minimum tension for both experiment and control.  
 
-```{r CombinationLineplot}
+```{r CombinationLineplot, fig.height = 7, fig.width= 9}
 
 
 library(ggplot2)
@@ -426,9 +398,9 @@ ggplot(Exp, aes(x= ramp.num, y= pvb.BL.tension, color = Trial)) +
   geom_smooth(method ="lm", se=FALSE, color = "black", aes (group = 1))+ 
   ggtitle("Baseline Tension")+
   theme(plot.title = element_text(hjust=0.5)) +
-  scale_x_continuous("Time(Min.)", breaks = round(seq(min(Exp$ramp.num), max(Exp$ramp.num), by=2),1))+
+  scale_x_continuous("Ramp number", breaks = round(seq(min(Exp$ramp.num), max(Exp$ramp.num), by=2),1))+
   theme(axis.text.x = element_text(angle = 45, hjust = 1))+
-  scale_y_continuous("Percent varation from baseline",  breaks = round(seq(min(Exp$pvb.BL.tension), max(Exp$pvb.BL.tension), by = 0.1),1)) 
+  scale_y_continuous("Percent change from baseline",labels = scales::percent, breaks = round(seq(min(Exp$pvb.BL.tension), max(Exp$pvb.BL.tension), by = 0.1),1)) 
   
   
 
@@ -440,9 +412,9 @@ ggplot(Exp, aes(x = ramp.num, y=pvb.peak.tension, color = Trial)) +
   geom_smooth(method ="lm", se=FALSE, color = "black", aes (group = 1))+
   ggtitle("Peak Tension")+
 theme(plot.title = element_text(hjust=0.5))+
-  scale_x_continuous("Time(Min.)", breaks = round(seq(min(Exp$ramp.num), max(Exp$ramp.num), by=2),1))+
+  scale_x_continuous("RampRamp number", breaks = round(seq(min(Exp$ramp.num), max(Exp$ramp.num), by=2),1))+
   theme(axis.text.x = element_text(angle = 45, hjust = 1))+
-  scale_y_continuous("Percent varation from baseline", breaks = round(seq(min(Exp$pvb.peak.tension), max(Exp$pvb.peak.tension), by = 1.2),1))
+  scale_y_continuous("Percent change from baseline", labels = scales::percent, breaks = round(seq(min(Exp$pvb.peak.tension), max(Exp$pvb.peak.tension), by = 0.1),1))
 
 
 
@@ -454,9 +426,9 @@ ggplot(Exp, aes(x=ramp.num, y=pvb.SR, color= Trial))+
   geom_smooth(method ="lm", se=FALSE, color = "black", aes (group = 1))+
   ggtitle("SR") +
   theme(plot.title = element_text(hjust=0.5))+
-  scale_x_continuous("Time(Min.)",breaks = round(seq(min(Exp$ramp.num), max(Exp$ramp.num), by=2),1))+
+  scale_x_continuous("Ramp number",breaks = round(seq(min(Exp$ramp.num), max(Exp$ramp.num), by=2),1))+
   theme(axis.text.x = element_text(angle = 45, hjust = 1))+
-  scale_y_continuous("Percent varation from baseline", breaks = round(seq(min(Exp$pvb.SR), max(Exp$pvb.SR), by = 0.8),1))
+  scale_y_continuous("Percent change from baseline", labels = scales::percent, breaks = round(seq(min(Exp$pvb.SR), max(Exp$pvb.SR), by = 0.1),1))
 
 
 #plot of min tension
@@ -467,9 +439,9 @@ ggplot(Exp, aes(x=ramp.num, y=pvb.min, color = Trial))+
   geom_smooth(method ="lm", se=FALSE, color = "black", aes (group = 1)) +
   ggtitle("Minimum")+
   theme(plot.title = element_text(hjust=0.5))+
-   scale_x_continuous("Time(Min.)", breaks = round(seq(min(Exp$ramp.num), max(Exp$ramp.num), by=2),1))+
+   scale_x_continuous("Ramp number", breaks = round(seq(min(Exp$ramp.num), max(Exp$ramp.num), by=2),1))+
   theme(axis.text.x = element_text(angle = 45, hjust = 1))+
-  scale_y_continuous("Percent varation from baseline", breaks = round(seq(min(Exp$pvb.min), max(Exp$pvb.min), by = 2),1))
+  scale_y_continuous("Percent change from baseline",labels = scales::percent, breaks = round(seq(min(Exp$pvb.min), max(Exp$pvb.min), by = 0.1),1))
 
 
 #plot of graphs for control group
@@ -483,9 +455,9 @@ ggplot(Control, aes(x= ramp.num, y= pvb.BL.tension, color = Trial)) +
   geom_smooth(method ="lm", se=FALSE, color = "black", aes (group = 1))+
   ggtitle("Control Baseline Tension")+
   theme(plot.title = element_text(hjust=0.5))+scale_x_continuous("Time(Min.)")+
-   scale_x_continuous("Time(Min.)", breaks = round(seq(min(Control$ramp.num), max(Control$ramp.num), by=2),1))+
+   scale_x_continuous("Ramp number", breaks = round(seq(min(Control$ramp.num), max(Control$ramp.num), by=2),1))+
   theme(axis.text.x = element_text(angle = 45, hjust = 1))+
-  scale_y_continuous("Percent varation from baseline",  breaks = round(seq(min(Control$pvb.BL.tension), max(Control$pvb.BL.tension), by = 0.1),1)) 
+  scale_y_continuous("Percent change from baseline",labels = scales::percent,  breaks = round(seq(min(Control$pvb.BL.tension), max(Control$pvb.BL.tension), by = 0.1),1)) 
 
 
 
@@ -497,9 +469,10 @@ ggplot(Control, aes(x = ramp.num, y=pvb.peak.tension, color = Trial))+
   geom_smooth(method ="lm", se=FALSE, color = "black", aes (group = 1))+
 ggtitle("Control Peak Tension")+
   theme(plot.title = element_text(hjust=0.5))+
-  scale_x_continuous("Time(Min.)", breaks = round(seq(min(Control$ramp.num), max(Control$ramp.num), by=2),1))+
+  scale_x_continuous("Ramp number", breaks = round(seq(min(Control$ramp.num), max(Control$ramp.num), by=2),1))+
   theme(axis.text.x = element_text(angle = 45, hjust = 1))+
-  scale_y_continuous("Percent varation from baseline", breaks = round(seq(min(Control$pvb.peak.tension), max(Control$pvb.peak.tension), by = 1.2),1)) 
+  scale_y_continuous("Percent change from baseline",labels = scales::percent, breaks = round(seq(min(Control$pvb.peak.tension), max(Control$pvb.peak.tension), by = 0.1),1))
+  
 
 
 #plot of peak plateu 3.25-3.75
@@ -510,9 +483,9 @@ ggplot(Control, aes(x=ramp.num, y=pvb.SR, color= Trial))+
   geom_smooth(method ="lm", se=FALSE, color = "black", aes (group = 1)) +
   ggtitle("Control SR")+
   theme(plot.title = element_text(hjust=0.5))+
-  scale_x_continuous("Time(Min.)",breaks = round(seq(min(Control$ramp.num), max(Control$ramp.num), by=2),1))+
+  scale_x_continuous("Ramp number",breaks = round(seq(min(Control$ramp.num), max(Control$ramp.num), by=2),1))+
   theme(axis.text.x = element_text(angle = 45, hjust = 1))+
-  scale_y_continuous("Percent varation from baseline", breaks = round(seq(min(Control$pvb.SR), max(Control$pvb.SR), by = 0.8),1))
+  scale_y_continuous("Percent change from baseline",labels = scales::percent, breaks = round(seq(min(Control$pvb.SR), max(Control$pvb.SR), by = 0.1),1))
 
 #plot of min tension
 
@@ -522,10 +495,12 @@ ggplot(Control, aes(x=ramp.num, y=pvb.min, color = Trial))+
   geom_smooth(method ="lm", se=FALSE, color = "black", aes (group = 1))+
   ggtitle("Control Minimum")+
   theme(plot.title = element_text(hjust=0.5))+
-  scale_x_continuous("Time(Min.)", breaks = round(seq(min(Control$ramp.num), max(Control$ramp.num), by=2),1))+
+  scale_x_continuous("Ramp number", breaks = round(seq(min(Control$ramp.num), max(Control$ramp.num), by=2),1))+
   theme(axis.text.x = element_text(angle = 45, hjust = 1))+
-  scale_y_continuous("Percent varation from baseline", breaks = round(seq(min(Control$pvb.min), max(Control$pvb.min), by = 2),1))
+  scale_y_continuous("Percent change from baseline",labels = scales::percent, breaks = round(seq(min(Control$pvb.min), max(Control$pvb.min), by = 2),1))
   
+
+
 
 
 
@@ -534,7 +509,7 @@ ggplot(Control, aes(x=ramp.num, y=pvb.min, color = Trial))+
 ### Multiple plot for multiple line plot
 
 Produces a multiplot for each combination line plot. Baseline tension, peak tension, average tension 3.25-3.27 of 4 sec. static stretch, and minimum tension) that shows the percent variation from baseline (first 20 minutes of experiment) over time of the experiment and contains a legend for the date of each trial. 
-```{r combinationLineplot}
+```{r combinationLineplot, fig.height = 7, fig.width= 9}
 
 #combining the individual plots so they can be compared
 
@@ -604,7 +579,7 @@ a1 = ggplot(Exp, aes(x= ramp.num, y= pvb.BL.tension, color = Trial)) +
   theme(plot.title = element_text(hjust=0.5)) +
   scale_x_continuous("Time(Min.)", breaks = round(seq(min(Exp$ramp.num), max(Exp$ramp.num), by=2),1))+
   theme(axis.text.x = element_text(angle = 45, hjust = 1))+
-  scale_y_continuous("Percent varation from baseline",  breaks = round(seq(min(Exp$pvb.BL.tension), max(Exp$pvb.BL.tension), by = 0.1),1))+
+  scale_y_continuous("Percent change from baseline",labels = scales::percent,  breaks = round(seq(min(Exp$pvb.BL.tension), max(Exp$pvb.BL.tension), by = 0.1),1))+
   theme(legend.position = "none")
 
 
@@ -618,7 +593,7 @@ b1 = ggplot(Exp, aes(x = ramp.num, y=pvb.peak.tension, color = Trial)) +
 theme(plot.title = element_text(hjust=0.5))+
   scale_x_continuous("Time(Min.)", breaks = round(seq(min(Exp$ramp.num), max(Exp$ramp.num), by=2),1))+
   theme(axis.text.x = element_text(angle = 45, hjust = 1))+
-  scale_y_continuous("Percent varation from baseline", breaks = round(seq(min(Exp$pvb.peak.tension), max(Exp$pvb.peak.tension), by = 1.2),1))+theme(legend.position = "none")
+  scale_y_continuous("Percent change from baseline", labels = scales::percent, breaks = round(seq(min(Exp$pvb.peak.tension), max(Exp$pvb.peak.tension), by = 1.2),1))+theme(legend.position = "none")
 
 
 
@@ -632,7 +607,7 @@ c1 = ggplot(Exp, aes(x=ramp.num, y=pvb.SR, color= Trial))+
   theme(plot.title = element_text(hjust=0.5))+
   scale_x_continuous("Time(Min.)",breaks = round(seq(min(Exp$ramp.num), max(Exp$ramp.num), by=2),1))+
   theme(axis.text.x = element_text(angle = 45, hjust = 1))+
-  scale_y_continuous("Percent varation from baseline", breaks = round(seq(min(Exp$pvb.SR), max(Exp$pvb.SR), by = 0.8),1))+theme(legend.position = "none")
+  scale_y_continuous("Percent change from baseline", labels = scales::percent, breaks = round(seq(min(Exp$pvb.SR), max(Exp$pvb.SR), by = 0.8),1))+theme(legend.position = "none")
 
 
 #plot of min tension
@@ -645,7 +620,7 @@ d1 = ggplot(Exp, aes(x=ramp.num, y=pvb.min, color = Trial))+
   theme(plot.title = element_text(hjust=0.5))+
    scale_x_continuous("Time(Min.)", breaks = round(seq(min(Exp$ramp.num), max(Exp$ramp.num), by=2),1))+
   theme(axis.text.x = element_text(angle = 45, hjust = 1))+
-  scale_y_continuous("Percent varation from baseline", breaks = round(seq(min(Exp$pvb.min), max(Exp$pvb.min), by = 2),1))
+  scale_y_continuous("Percent change from baseline",labels = scales::percent, breaks = round(seq(min(Exp$pvb.min), max(Exp$pvb.min), by = 2),1))
 
 
   
@@ -664,7 +639,7 @@ a_2 = ggplot(Control, aes(x= ramp.num, y= pvb.BL.tension, color = Trial)) +
   theme(plot.title = element_text(hjust=0.5))+scale_x_continuous("Time(Min.)")+
    scale_x_continuous("Time(Min.)", breaks = round(seq(min(Control$ramp.num), max(Control$ramp.num), by=2),1))+
   theme(axis.text.x = element_text(angle = 45, hjust = 1))+
-  scale_y_continuous("Percent varation from baseline",  breaks = round(seq(min(Control$pvb.BL.tension), max(Control$pvb.BL.tension), by = 0.1),1)) +theme(legend.position = "none")
+  scale_y_continuous("Percent varation from baseline", labels = scales::percent, breaks = round(seq(min(Control$pvb.BL.tension), max(Control$pvb.BL.tension), by = 0.1),1)) +theme(legend.position = "none")
 
 
 #plot of peak tension
@@ -677,7 +652,7 @@ ggtitle("Control Peak Tension")+
   theme(plot.title = element_text(hjust=0.5))+
   scale_x_continuous("Time(Min.)", breaks = round(seq(min(Control$ramp.num), max(Control$ramp.num), by=2),1))+
   theme(axis.text.x = element_text(angle = 45, hjust = 1))+
-  scale_y_continuous("Percent varation from baseline", breaks = round(seq(min(Control$pvb.peak.tension), max(Control$pvb.peak.tension), by = 1.2),1)) +theme(legend.position = "none")
+  scale_y_continuous("Percent varation from baseline",labels = scales::percent, breaks = round(seq(min(Control$pvb.peak.tension), max(Control$pvb.peak.tension), by = 1.2),1)) +theme(legend.position = "none")
 
 
 
@@ -691,7 +666,7 @@ c_2 = ggplot(Control, aes(x=ramp.num, y=pvb.SR, color= Trial))+
   theme(plot.title = element_text(hjust=0.5))+
   scale_x_continuous("Time(Min.)",breaks = round(seq(min(Control$ramp.num), max(Control$ramp.num), by=2),1))+
   theme(axis.text.x = element_text(angle = 45, hjust = 1))+
-  scale_y_continuous("Percent varation from baseline", breaks = round(seq(min(Control$pvb.SR), max(Control$pvb.SR), by = 0.8),1))+theme(legend.position = "none")
+  scale_y_continuous("Percent varation from baseline",labels = scales::percent, breaks = round(seq(min(Control$pvb.SR), max(Control$pvb.SR), by = 0.8),1))+theme(legend.position = "none")
 
 #plot of min tension
 
@@ -703,7 +678,7 @@ d_2 = ggplot(Control, aes(x=ramp.num, y=pvb.min, color = Trial))+
   theme(plot.title = element_text(hjust=0.5))+
   scale_x_continuous("Time(Min.)", breaks = round(seq(min(Control$ramp.num), max(Control$ramp.num), by=2),1))+
   theme(axis.text.x = element_text(angle = 45, hjust = 1))+
-  scale_y_continuous("Percent varation from baseline", breaks = round(seq(min(Control$pvb.min), max(Control$pvb.min), by = 2),1))
+  scale_y_continuous("Percent varation from baseline",labels = scales::percent, breaks = round(seq(min(Control$pvb.min), max(Control$pvb.min), by = 2),1))
 
 
 
@@ -724,7 +699,7 @@ d_2 = ggplot(Control, aes(x=ramp.num, y=pvb.min, color = Trial))+
 
  Produces a line plot of averages compared to time of experiment for multiple trials for average tension 3.25-3.75 of 4 sec. static stretch with error bars. This code will produce a graph of averages for treatment and control, a single plot of averages with two lines with error bars for treatment and control, and both individual graphs of average treatment and control faceted together.   
 
-```{r plotAverages}
+```{r plotAverages,fig.height = 7, fig.width= 8}
 
 #groups the ramp number and takes the average of all SR values for both experiment and control
 
@@ -768,7 +743,7 @@ Exp10 = as.data.frame(table(Exp$Macro))
  Con8$sd = Con8_sd$sd
  
  
-Con10 = as.data.frame(table(Exp$Macro))
+Con10 = as.data.frame(table(Control$Macro))
    Con9 =  sqrt(Con10$Freq)
    Con8$SE = Con8$sd / Con9
 
@@ -797,7 +772,7 @@ library(ggplot2)
        ggtitle("Average SR versus Time for Treatment Group\n")+
   theme(plot.title = element_text(hjust=0.5))+
   labs(x="Time\n", y = "Average SR\n")+
-        scale_x_continuous(breaks = round(seq(min(Con8$Macro), max(Con8$Macro), by=1),1))+
+        scale_x_continuous(breaks = round(seq(min(Exp8$Macro), max(Exp8$Macro), by=1),1))+
   theme(axis.text.x = element_text(angle = 0, hjust = 1))
      
      
@@ -823,24 +798,27 @@ library(ggplot2)
        scale_colour_manual(values = "steelblue")+
     geom_line() +
     geom_point()+
-     ggtitle("Average SR versus Time for Treatment and Control\n")+
-      theme(plot.title = element_text(hjust=0.5))+
-         scale_x_continuous(breaks = round(seq(min(Con8$Macro), max(Con8$Macro), by=1),1))+
-  theme(axis.text.x = element_text(angle = 0, hjust = 1))+
-    theme(axis.title.x=element_blank(),
-        axis.text.x=element_blank(),
-        axis.ticks.x=element_blank())
+    # ggtitle("Average SR versus Time for Treatment and Control\n")+
+      #theme(plot.title = element_text(hjust=0.5))+
+         scale_x_continuous(breaks = round(seq(min(Exp8$Macro), max(Exp8$Macro), by=1),1))+
+  theme(axis.text.x = element_text(angle = 0, hjust = 1))
+ 
     
  z2=  ggplot(Con8, aes(x=Macro, y=avg.all.macro, colour= type)) + 
    geom_errorbar(aes(ymin= ymin, ymax=ymax), width=.1) +
    scale_colour_manual(values = "green")+
     geom_line() +
     geom_point()+
+   ggtitle("Average SR versus Time for Treatment and Control\n")+
+      theme(plot.title = element_text(hjust=0.5))+
    scale_x_continuous("Time(Min.)", breaks = round(seq(min(Con8$Macro), max(Con8$Macro), by=1),1))+
   theme(axis.text.x = element_text(angle = 0, hjust = 1))
+     # +theme(axis.title.x=element_blank(),
+     #   axis.text.x=element_blank(),
+     #   axis.ticks.x=element_blank())
    
    
- multiplot(z1,z2, cols = 1)  
+ multiplot(z2,z1, cols = 1)  
      
 # single graph comparing treatment and control
  
@@ -885,7 +863,7 @@ labs(x="Time\n", y = "Average SR\n")+
 Produces graphs of dot plots with error bars of the average SR (3.25-3.75 of static stretch) per 20 minutes of the experiment for every trial. Graphs are produced independently for treatment and control, a multiplot that shows treatment and control, and a single graph that shows treatment and control.    
 
 
-```{r dotPlot}
+```{r dotPlot, fig.height = 7, fig.width= 8}
 
 #Experimental group subsetting and calculation of mean, standard deviation, and standard error. 
 
@@ -1021,7 +999,7 @@ ggplot(Exp_Con11, aes(x=Exp_Con11$type, y=avg.all.macro, group = num.type, color
 
 Produces a line plot of peak tension as a percent variation from baseline tension over time of experiment. This graph also includes a picture of the afferent firing caused by the first static stretch. The caption of this graph lists the standard deviation values for each 20-minute period of the experiment. 
 
-```{r lineDatavisualization}
+```{r lineDatavisualization, fig.height = 7, fig.width= 8}
 
 library(dplyr)
 library(png)
@@ -1051,7 +1029,7 @@ g <- rasterGrob(img, interpolate=TRUE, height = 1, width = 1) #chnage height and
   theme(plot.title = element_text(hjust=0.5)) +
     scale_x_continuous("Time(Min.)", breaks = round(seq(min(Exp$ramp.num), max(Exp$ramp.num), by=2),1))+
    theme(axis.text.x = element_text(angle = 45, hjust = 1))+
-  scale_y_continuous("Percent varation from baseline",  breaks = round(seq(min(Exp$pvb.BL.tension), max(Exp$pvb.BL.tension), by = 0.1),1))+
+  scale_y_continuous("Percent change from baseline", labels = scales::percent, breaks = round(seq(min(Exp$pvb.BL.tension), max(Exp$pvb.BL.tension), by = 0.1),1))+
     expand_limits(y=1.7)
     
    
@@ -1068,8 +1046,11 @@ w7 =Exp8_sd$sd[7]
     
   # until I can find a better way to do this, highlight the line below, you will copy and paste these values under the caption on line 1086
 
-   mysds = c( w1, w2, w3, w4, w5, w6, w7)
-   mysds = round(mysds, digits = 3)
+
+
+cat( w1, w2, w3, w4, w5, w6, w7, sep = "  ")
+   #mysds = c( w1, w2, w3, w4, w5, w6, w7)
+  # mysds = round(mysds, digits = 3)
   # mysds2 = paste(sprintf(fmt ="%2.3f", mysds), collapse=' ')
    #mysds2  = paste("Standard Deviation:",mysds2)
     
@@ -1087,11 +1068,11 @@ g <- rasterGrob(img, interpolate=TRUE, height = 1, width = 1) #chnage height and
   geom_smooth(method ="lm", se=FALSE, color = "black", aes (group = 1))+ 
   ggtitle("Baseline Tension")+
   theme(plot.title = element_text(hjust=0.5)) +
-    scale_x_continuous("Time(Min.)", breaks = round(seq(min(Exp$ramp.num), max(Exp$ramp.num), by=2),1))+
+    scale_x_continuous("Ramp Number", breaks = round(seq(min(Exp$ramp.num), max(Exp$ramp.num), by=2),1))+
    theme(axis.text.x = element_text(angle = 45, hjust = 1))+
-  scale_y_continuous("Percent varation from baseline",  breaks = round(seq(min(Exp$pvb.BL.tension), max(Exp$pvb.BL.tension), by = 0.1),1))+
+  scale_y_continuous("Percent varation from baseline", labels = scales::percent,  breaks = round(seq(min(Exp$pvb.BL.tension), max(Exp$pvb.BL.tension), by = 0.1),1))+
     expand_limits(y=1.7)+
-   labs(caption = mysds2) 
+   labs(caption = "Standard Deviation: 4.195153  3.882836  3.67814  3.351317  3.856701  2.792751  0.0548267") 
    
   
   #annotate("text", x = seq(from = 6, to = max(x-axis), by = 6), y = , label = mysds)
@@ -1150,6 +1131,38 @@ library(dplyr)
 Exp_25 = Exp_24%>%
   arrange(Trial)
 
+
+
+
+# Reorganizing data frame 
+
+#Exp_26 = Exp_25
+
+#Exp_26$type.num = NULL
+# creating a new data frame for data output
+
+#newdf = data.frame(matrix(NA, nrow = 24, ncol = 8))
+
+#for loop to organize data
+
+for(i in 1:nrow(Exp_25)){
+  cols  = c(2,8,14,20,26,32,38)
+   for(j in 1:length(cols)){
+     #print(cols[j])
+     if (j == 1 & i == 1){
+      temp = Exp_25[i,cols[j]:(cols[j]+5)]
+      temp$Trial = Exp_25[i,"Trial"]
+      temp$type = Exp_25[i,"type"]
+     } else {
+      temp2 = Exp_25[i,cols[j]:(cols[j]+5)]
+      temp2$Trial = Exp_25[i,"Trial"]
+      temp2$type = Exp_25[i,"type"]
+      colnames(temp2)[1:6] = as.character(1:6)
+      temp = rbind(temp,temp2)
+     }
+  }
+}
+Exp_26 = temp
  
 
 #write dataframe to excel sheet
