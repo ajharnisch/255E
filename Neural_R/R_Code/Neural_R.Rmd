@@ -1,7 +1,7 @@
 ---
-title: "Portfolio"
+title: "Neural Analysis (Ramps and Vibrations)"
 author: "Arthur Harnisch"
-date: "December 13, 2017"
+date: "December 10, 2017"
 output: word_document
 ---
 
@@ -69,14 +69,14 @@ this chunk lists packages that are required for the code to function. All of the
 ```
 ###Importing data
 
-A folder named Tension_R was created so that multiple .csv files could be placed into it and analyzed. In this folder there are two folders, Experiment and Control. ".csv"" files from experiment, or control files are placed under appropriate folder.    
+A folder named Neural_R was created so that multiple .csv files could be placed into it and analyzed. In this folder there are two folders, Experiment and Control. ".csv"" files from experiment, or control files are placed under appropriate folder.    
 
 ```{r dataImport}
 
 #multiple data import for experiment by use of for loop to find .csv files and rbind to single data frame for Experiment. 
 
 #myfiles is a new data frame for all .csv files from Experiment folder 
-myfiles=dir("../Tension_R/Experiment", pattern = "*.csv$", all.files = TRUE, full.names = TRUE)
+myfiles=dir("../Neural_R/Experiment", pattern = "*.csv$", all.files = TRUE, full.names = TRUE)
 
 #for loop loops over myfiles
 
@@ -132,7 +132,7 @@ for(i in 1: length(myfiles) ){
 
 #create a data frame for control
 
-myfiles=dir("../Tension_R/Control", pattern = "*.csv$", all.files = TRUE, full.names = TRUE)
+myfiles=dir("../Neural_R/Control", pattern = "*.csv$", all.files = TRUE, full.names = TRUE)
 
 # For control 
 for(i in 1: length(myfiles) ){
@@ -1174,6 +1174,7 @@ write.xlsx(Exp_26, file = "C:\\Users\\Arthur\\255E\\Tension_R\\Exp_output\\Exp_o
 
 
 ```
+
 
 
 
