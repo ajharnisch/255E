@@ -6,7 +6,7 @@ output: word_document
 ---
 
 ```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE)
+knitr::opts_chunk$set(echo = FALSE)#echo = TRUE means that in the knit file the code will be displayed. 
 ```
 ###Outline of R Code Function for Muscle Tension Analysis and Graphs
 
@@ -33,9 +33,22 @@ Required packages: ggplot2, dplyr, splitstackshape, reshape, grid, png.
 
 ###Installing Packages
 this chunk lists packages that are required for the code to function. All of the items in this chunk are commented out so that the r markdown can knit.  
+
+```{r directory}
+#set user directory by copying line 40 to console
+
+setwd("C:/Users/Arthur/255E")
+
+
+```
+
+
+
 ```{r packageInstall}
 # Packages necessary for this r code
 #sections are commented out so document can knit
+
+#if you have not used this code on this computer remove all of the # next to install.packages("...") so package can be installed. 
 
 #ggplot2
 
@@ -75,15 +88,18 @@ A folder named Neural_R was created so that multiple .csv files could be placed 
 
 #multiple data import for experiment by use of for loop to find .csv files and rbind to single data frame for Experiment. 
 
+
+
+
 #myfiles is a new data frame for all .csv files from Experiment folder 
-myfiles=dir("../Neural_R/Experiment", pattern = "*.csv$", all.files = TRUE, full.names = TRUE)
+myfiles=dir(path = "C:/Users/Arthur/255E/Neural_R//Experiment", pattern = "*.csv$", all.files = TRUE, full.names = TRUE)
 
 #for loop loops over myfiles
 
 for(i in 1: length(myfiles) ){
   
   #open each file
-  # read.csv(myfiles[i])
+   read.csv(myfiles[i])
   temp = read.csv(myfiles[i])
   fname = basename(myfiles[i])
   
@@ -101,7 +117,7 @@ for(i in 1: length(myfiles) ){
   temp2$Macro = NA
   
   for (j in 1:length(macroRows)){
-    macroNum = temp2$BL.tension[macroRows[j]]
+    macroNum = temp2$Resting.discharge[macroRows[j]]
     if (j < length(macroRows)){
       temp2$Macro[(macroRows[j]+1) : (macroRows[j+1]-1) ] = macroNum
     } else if (j == length(macroRows)){
@@ -132,7 +148,7 @@ for(i in 1: length(myfiles) ){
 
 #create a data frame for control
 
-myfiles=dir("../Neural_R/Control", pattern = "*.csv$", all.files = TRUE, full.names = TRUE)
+myfiles=dir("C:/Users/Arthur/255E/Neural_R/Control", pattern = "*.csv$", all.files = TRUE, full.names = TRUE)
 
 # For control 
 for(i in 1: length(myfiles) ){
@@ -153,7 +169,7 @@ for(i in 1: length(myfiles) ){
   temp2$Macro = NA
   
   for (j in 1:length(macroRows)){
-    macroNum = temp2$BL.tension[macroRows[j]]
+    macroNum = temp2$Resting.discharge[macroRows[j]]
     if (j < length(macroRows)){
       temp2$Macro[(macroRows[j]+1) : (macroRows[j+1]-1) ] = macroNum
     } else if (j == length(macroRows)){
@@ -182,81 +198,121 @@ for(i in 1: length(myfiles) ){
 
 ```
 
-###Data manipulation 
+###Data manipulation, Percent change from Baseline of Experiment
 
-This code finds the percent variation from baseline for 10 sec. before static stretch (baseline tension), peak tension, average tension 3.25-3.27 of 4 sec. static stretch, and minimum tension
+This code finds the percent change from baseline for Resting discharge, DP, IST, FST, DI, 50 hz vibrations, 100 hz vibrations for experiment. 
 
-
-###Percent Variation from Baseline of Experiment 
-
+The calculations below are not converted to a percent, but will be done so latter when graphing. 
 
 ```{r dataManipulation_EXP}
 
-#calculates the percept change from baseline for each of the trials and makes a seperate column to display the percent from variation 10 sec. before static stretch (baseline tension), peak tension, average tension 3.25-3.27 of 4 sec. static stretch, and minimum tension. 
+#calculates the percept change from baseline for each of the trials and makes a seperate column to display the percent from variation 10 sec. before static stretch (baseline tension), peak tension, average tension 3.25-3.75 of 4 sec. static stretch, and minimum tension. 
 
 
 
 #data manipulations are for Experiment group
 
 
-# finding the percent variation from baseline (first 6 time points of file) of BL.tension 
+# finding the percent change from baseline (first 6 time points of file) of Resting.discharge 
 
  
 
 library(dplyr)
 Exp1 = tbl_df(Exp)
 
-# res = filter(Exp1, Macro == 1, Ramp.. <7)   #dplyr filter 
+#res = filter(Exp1, Macro == 1, Ramp.. <7)   #dplyr filter 
 
  res1 = Exp1[Exp1$Macro == 1 & Exp1$Ramp.. < 7,] #base r filter 
 
 res2 = res1 %>%
   group_by(Trial)%>%
-  summarise(avg_BSL.BL.Tension = mean(BL.tension, na.rm = TRUE))
+  summarise(avg_reseting.discharge = mean(Resting.discharge, na.rm = TRUE))
 
 
-  Exp$avg_BSL.BLtension = res2$avg_BSL.BL.Tension[match(Exp$Trial, res2$Trial)]
+  Exp$avg_reseting.discharge = res2$avg_reseting.discharge[match(Exp$Trial, res2$Trial)]
 
 
-Exp$pvb.BL.tension = Exp$BL.tension / Exp$avg_BSL.BLtension
+Exp$pcb.resting.discharge = Exp$Resting.discharge / Exp$avg_reseting.discharge
 
 
-#finding the percent variation from baseline in Peak tension
+#finding the percent variation from baseline in DP
 
 res3 = res1 %>%
   group_by(Trial)%>%
-  summarise(avg_BSL.peak.tension = mean(peak.tension, na.rm = TRUE))
+  summarise(avg_DP = mean(DP, na.rm = TRUE))
 
 
- Exp$avg_BSL.peak.tension = res3$avg_BSL.peak.tension[match(Exp$Trial, res3$Trial)]
+ Exp$avg_DP = res3$avg_DP[match(Exp$Trial, res3$Trial)]
  
- Exp$pvb.peak.tension = Exp$peak.tension / Exp$avg_BSL.peak.tension
+ Exp$pcb.DP = Exp$DP / Exp$avg_DP
  
- #finding the percent variation form baseline in 3.25 - 3.75 
+ #finding the percent change form baseline in IST
  
  
  res4 = res1 %>%
   group_by(Trial)%>%
-  summarise(avg_BSL.SR = mean(average.of.all.interval.points, na.rm = TRUE))
+  summarise(avg_IST = mean(IST, na.rm = TRUE))
 
 
- Exp$avg_BSL.SR = res4$avg_BSL.SR[match(Exp$Trial, res4$Trial)]
+ Exp$avg_IST = res4$avg_IST[match(Exp$Trial, res4$Trial)]
  
- Exp$pvb.SR = Exp$average.of.all.interval.points / Exp$avg_BSL.SR
+ Exp$pcb.IST = Exp$IST / Exp$avg_IST
 
  
- # finding the percent variation from baseline in Minimum values 
+  #finding the percent variation form baseline in FST
+ 
+ 
+ res5 = res1 %>%
+  group_by(Trial)%>%
+  summarise(avg_FST = mean(FST, na.rm = TRUE))
+
+
+ Exp$avg_FST = res5$avg_FST[match(Exp$Trial, res5$Trial)]
+ 
+ Exp$pcb.FST = Exp$FST / Exp$avg_FST
+ 
+ 
+ # finding the percent variation from baseline in DI
 
  
   
- res5 = res1 %>%
+ res6 = res1 %>%
   group_by(Trial)%>%
-  summarise(avg_BSL.min = mean(Min.value, na.rm = TRUE))
+  summarise(avg_DI = mean(DI, na.rm = TRUE))
 
 
- Exp$avg_BSL.min = res5$avg_BSL.min[match(Exp$Trial, res5$Trial)]
+ Exp$avg_DI = res6$avg_DI[match(Exp$Trial, res6$Trial)]
  
- Exp$pvb.min = Exp$Min.value / Exp$avg_BSL.min
+ Exp$pcb.DI = Exp$DI / Exp$avg_DI
+ 
+  
+ # finding the percent change from baseline in 50Hz vibrations
+
+ 
+  
+ res7 = res1 %>%
+  group_by(Trial)%>%
+  summarise(avg_50hz = mean(X50hz.frequency, na.rm = TRUE))
+
+
+ Exp$avg_50hz = res7$avg_50hz[match(Exp$Trial, res7$Trial)]
+ 
+ Exp$pcb.50hz = Exp$X50hz.frequency / Exp$avg_50hz
+ 
+ 
+  
+ # finding the percent change from baseline in 100 Hz vibrations
+
+ 
+  
+ res8 = res1 %>%
+  group_by(Trial)%>%
+  summarise(avg_100hz = mean(X100hz.frequency, na.rm = TRUE))
+
+
+ Exp$avg_100hz = res8$avg_100hz[match(Exp$Trial, res8$Trial)]
+ 
+ Exp$pcb.100hz = Exp$X100hz.frequency / Exp$avg_100hz
  
  
  #creating numeric x-axis for plotting that will label the ramp number in the file for each file. 
@@ -268,18 +324,8 @@ res3 = res1 %>%
 Exp$ramp.num = Exp5$.id
 
  
-
-
-
-#reshape data for BL tension
-#library(reshape)
-#Exp7 = cast(Exp, ramp.num~Trial, value = "pvb.BL.tension" )
-
-
-
-
- 
 ```
+
 
 
 ###Percent variation from baseline of Control
@@ -301,42 +347,57 @@ This is a code to find the percent change from baseline of the files that were p
 
 con2 = con1 %>%
   group_by(Trial)%>%
-  summarise(avg_BSL.BL.Tension = mean(BL.tension, na.rm = TRUE))
+  summarise(avg_reseting.discharge = mean(Resting.discharge, na.rm = TRUE))
 
 
-  Control$avg_BSL.BLtension = con2$avg_BSL.BL.Tension[match(Control$Trial, con2$Trial)]
+  Control$avg_reseting.discharge = con2$avg_reseting.discharge[match(Control$Trial, con2$Trial)]
 
 
-Control$pvb.BL.tension = Control$BL.tension / Control$avg_BSL.BLtension
+Control$pcb.resting.discharge = Control$Resting.discharge / Control$avg_reseting.discharge
 
 
-#finding the percent variation from baseline in Peak tension
+ #finding the percent variation from baseline in DP
 
 con3 = con1 %>%
   group_by(Trial)%>%
-  summarise(avg_BSL.peak.tension = mean(peak.tension, na.rm = TRUE))
+summarise(avg_DP = mean(DP, na.rm = TRUE))
 
 
- Control$avg_BSL.peak.tension = con3$avg_BSL.peak.tension[match(Control$Trial, con3$Trial)]
+ Control$avg_DP = con3$avg_avg_DP[match(Control$Trial, con3$Trial)]
  
- Control$pvb.peak.tension = Control$peak.tension / Control$avg_BSL.peak.tension
+ Control$pcb.DP = Control$DP / Control$avg_DP
  
- #finding the percent variation form baseline in 3.25 - 3.75 
+ 
+ 
+
+
+
+
+
+
+ 
+
+ 
+  #finding the percent change form baseline in IST
  
  
  con4 = con1 %>%
   group_by(Trial)%>%
-  summarise(avg_BSL.SR = mean(average.of.all.interval.points, na.rm = TRUE))
+  summarise(avg_IST = mean(IST, na.rm = TRUE))
 
 
- Control$avg_BSL.SR = con4$avg_BSL.SR[match(Control$Trial, con2$Trial)]
+ Control$avg_IST = con4$avg_IST[match(Control$Trial, con2$Trial)]
  
- Control$pvb.SR = Control$average.of.all.interval.points / Control$avg_BSL.SR
-
- 
- # finding the percent variation from baseline in Minimum values 
+ Control$pcb.IST = Control$IST / Control$avg_IST
 
  
+
+ 
+ 
+ 
+ 
+ 
+  # finding the percent variation from baseline in Minimum values 
   
  con5 = con1 %>%
   group_by(Trial)%>%
@@ -369,73 +430,97 @@ library(ggplot2)
 
 #graphs for Experiment group
 
-#plot of baseline tension over time and will display each graph individually for Experiment group
+#plot of each type over time and will display each graph individually for Experiment group
 
-#Baseline tension
+#resting discharge
 
-ggplot(Exp, aes(x= ramp.num, y= pvb.BL.tension, color = Trial)) +
+ggplot(Exp, aes(x= ramp.num, y= pcb.resting.discharge, color = Trial)) +
     geom_point()+
   geom_line()+
   geom_smooth(method ="lm", se=FALSE, color = "black", aes (group = 1))+ 
-  ggtitle("Baseline Tension")+
+  ggtitle("Resting Discharge")+
   theme(plot.title = element_text(hjust=0.5)) +
   scale_x_continuous("Ramp number", breaks = round(seq(min(Exp$ramp.num), max(Exp$ramp.num), by=2),1))+
   theme(axis.text.x = element_text(angle = 45, hjust = 1))+
-  scale_y_continuous("Percent change from baseline",labels = scales::percent, breaks = round(seq(min(Exp$pvb.BL.tension), max(Exp$pvb.BL.tension), by = 0.1),1)) 
+  scale_y_continuous("Percent change from baseline",labels = scales::percent, breaks = round(seq(min(Exp$pcb.resting.discharge), max(Exp$pcb.resting.discharge), by = 0.1),1)) 
   
   
 
-#plot of peak tension
+#plot of DP
 
-ggplot(Exp, aes(x = ramp.num, y=pvb.peak.tension, color = Trial)) +
+ggplot(Exp, aes(x = ramp.num, y=pcb.DP, color = Trial)) +
     geom_point()+
   geom_line()+
   geom_smooth(method ="lm", se=FALSE, color = "black", aes (group = 1))+
-  ggtitle("Peak Tension")+
+  ggtitle("Dynamic Peak")+
 theme(plot.title = element_text(hjust=0.5))+
-  scale_x_continuous("RampRamp number", breaks = round(seq(min(Exp$ramp.num), max(Exp$ramp.num), by=2),1))+
+  scale_x_continuous("Ramp number", breaks = round(seq(min(Exp$ramp.num), max(Exp$ramp.num), by=2),1))+
   theme(axis.text.x = element_text(angle = 45, hjust = 1))+
-  scale_y_continuous("Percent change from baseline", labels = scales::percent, breaks = round(seq(min(Exp$pvb.peak.tension), max(Exp$pvb.peak.tension), by = 0.1),1))
+  scale_y_continuous("Percent change from baseline", labels = scales::percent, breaks = round(seq(min(Exp$pcb.DP), max(Exp$pcb.DP), by = 0.1),1))
 
 
 
-#plot of peak plateu 3.25-3.75
+#plot of IST
 
-ggplot(Exp, aes(x=ramp.num, y=pvb.SR, color= Trial))+
+ggplot(Exp, aes(x=ramp.num, y=pcb.IST, color= Trial))+
     geom_point()+
   geom_line()+
   geom_smooth(method ="lm", se=FALSE, color = "black", aes (group = 1))+
-  ggtitle("SR") +
+  ggtitle("IST") +
   theme(plot.title = element_text(hjust=0.5))+
   scale_x_continuous("Ramp number",breaks = round(seq(min(Exp$ramp.num), max(Exp$ramp.num), by=2),1))+
   theme(axis.text.x = element_text(angle = 45, hjust = 1))+
-  scale_y_continuous("Percent change from baseline", labels = scales::percent, breaks = round(seq(min(Exp$pvb.SR), max(Exp$pvb.SR), by = 0.1),1))
+  scale_y_continuous("Percent change from baseline", labels = scales::percent, breaks = round(seq(min(Exp$pcb.IST), max(Exp$pcb.IST), by = 0.1),1))
 
 
-#plot of min tension
+#plot of FST
 
-ggplot(Exp, aes(x=ramp.num, y=pvb.min, color = Trial))+
+ggplot(Exp, aes(x=ramp.num, y=pcb.FST, color = Trial))+
     geom_point()+
   geom_line()+
   geom_smooth(method ="lm", se=FALSE, color = "black", aes (group = 1)) +
-  ggtitle("Minimum")+
+  ggtitle("FST")+
   theme(plot.title = element_text(hjust=0.5))+
    scale_x_continuous("Ramp number", breaks = round(seq(min(Exp$ramp.num), max(Exp$ramp.num), by=2),1))+
   theme(axis.text.x = element_text(angle = 45, hjust = 1))+
-  scale_y_continuous("Percent change from baseline",labels = scales::percent, breaks = round(seq(min(Exp$pvb.min), max(Exp$pvb.min), by = 0.1),1))
+  scale_y_continuous("Percent change from baseline",labels = scales::percent, breaks = round(seq(min(Exp$pcb.FST), max(Exp$pcb.FST), by = 0.1),1))
 
 
-#baseline
-ggplot(Exp, aes(x= ramp.num, y= pvb.BL.tension, color = Trial)) +
+#plot of DI
+ggplot(Exp, aes(x= ramp.num, y= pcb.DI, color = Trial)) +
     geom_point()+
   geom_line()+
   geom_smooth(method ="lm", se=FALSE, color = "black", aes (group = 1))+ 
-  ggtitle("Baseline Tension")+
+  ggtitle("DI")+
   theme(plot.title = element_text(hjust=0.5)) +
   scale_x_continuous("Ramp number", breaks = round(seq(min(Exp$ramp.num), max(Exp$ramp.num), by=2),1))+
   theme(axis.text.x = element_text(angle = 45, hjust = 1))+
-  scale_y_continuous("Percent change from baseline",labels = scales::percent, breaks = round(seq(min(Exp$pvb.BL.tension), max(Exp$pvb.BL.tension), by = 0.1),1)) 
+  scale_y_continuous("Percent change from baseline",labels = scales::percent, breaks = round(seq(min(Exp$pcb.DI), max(Exp$pcb.DI), by = 0.1),1)) 
   
+
+
+#plot of 50hZ vibrations
+ggplot(Exp, aes(x= ramp.num, y= pcb.50hz, color = Trial)) +
+    geom_point()+
+  geom_line()+
+  geom_smooth(method ="lm", se=FALSE, color = "black", aes (group = 1))+ 
+  ggtitle("50 Hz Vibrations")+
+  theme(plot.title = element_text(hjust=0.5)) +
+  scale_x_continuous("Vibration number", breaks = round(seq(min(Exp$ramp.num), max(Exp$ramp.num), by=2),1))+
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))+
+  scale_y_continuous("Percent change from baseline",labels = scales::percent, breaks = round(seq(min(Exp$pcb.50hz), max(Exp$pcb.50hz), by = 0.1),1)) 
+
+
+#plot of 100hz vibrations
+ggplot(Exp, aes(x= ramp.num, y= pcb.100hz, color = Trial)) +
+    geom_point()+
+  geom_line()+
+  geom_smooth(method ="lm", se=FALSE, color = "black", aes (group = 1))+ 
+  ggtitle("100 Hz vibrations")+
+  theme(plot.title = element_text(hjust=0.5)) +
+  scale_x_continuous("Vibration number", breaks = round(seq(min(Exp$ramp.num), max(Exp$ramp.num), by=2),1))+
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))+
+  scale_y_continuous("Percent change from baseline",labels = scales::percent, breaks = round(seq(min(Exp$pcb.100hz), max(Exp$pcb.100hz), by = 0.1),1)) 
 
 #plot of graphs for control group
 

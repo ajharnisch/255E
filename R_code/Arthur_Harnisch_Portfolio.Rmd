@@ -329,7 +329,7 @@ con3 = con1 %>%
   summarise(avg_BSL.SR = mean(average.of.all.interval.points, na.rm = TRUE))
 
 
- Control$avg_BSL.SR = con4$avg_BSL.SR[match(Control$Trial, con2$Trial)]
+ Control$avg_BSL.SR = con4$avg_BSL.SR[match(Control$Trial, con4$Trial)]
  
  Control$pvb.SR = Control$average.of.all.interval.points / Control$avg_BSL.SR
 
@@ -343,7 +343,7 @@ con3 = con1 %>%
   summarise(avg_BSL.min = mean(Min.value, na.rm = TRUE))
 
 
- Control$avg_BSL.min = con5$avg_BSL.min[match(Control$Trial, con2$Trial)]
+ Control$avg_BSL.min = con5$avg_BSL.min[match(Control$Trial, con5$Trial)]
  
  Control$pvb.min = Control$Min.value / Control$avg_BSL.min
 
