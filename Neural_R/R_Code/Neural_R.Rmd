@@ -10,14 +10,32 @@ knitr::opts_chunk$set(echo = FALSE)#echo = TRUE means that in the knit file the 
 ```
 ###Outline of R Code Function for Muscle Tension Analysis and Graphs
 
-Experiments are conducted as a repeated measure design. Treatment and control experiments were conducted as separate trials. Trials typically occur for 100 minutes, but may occur for more or less time depending on protocol and quality of 
-type Ia muscle spindle afferent firing. A python code, "python tension.py" was used to gather data at the relevant time points for peak tension (highest point of static stretch), minimum tension (lowest point of static stretch), baseline tension (10 sec beofre static stretch), and SR (average between 3.25-3.75 sec. of 4 sec static stretch) for every ramp (static stretch) throughout the experiment. The python out-put is .csv and the file name was saved as analyzed year, month, date, muscle number, and trial letter. Under the file directory in a folder entitled tension, four folders exist experiment, control, img, and experiment output. Python.csv files were placed in experiment and control based on the type of trial, the image for the graph (point 6 below) placed in folder img entitled img (png file), and excel output will receive the excel output from the r code that organizes baseline, peak, SR, and minimum tension values group for each trial on one sheet. The features of this r code are listed below.  
+Experiments are conducted as a repeated measure design. Treatment and control experiments were conducted as separate trials. Trials typically occur for 100 minutes, but may occur for more or less time depending on protocol and quality of type Ia muscle spindle afferent firing. 
+
+At the time this code was written the python code to gather time points was under development. Once the python code is finished it will gather the data for resting discharge, DP, IST, FST, DI, 50 hz vibrations, 100 hz vibrations. 
+
+The python out-put is .csv and the file name was saved as analyzed year, month, date, muscle number, and trial letter (ie. 170109-1a). Under the file directory in a folder entitled Neural_R, four folders exist experiment, control, img, and experiment output. Python.csv files are to be placed under either experiment and control based on the type of trial, the image for the graph (point 6 below) placed in folder img entitled img (png file), and excel output will receive the excel output from the r code that organizes relevant data values grouped for each trial on one sheet. The features of this r code are listed below.  
+
+The idea of this code was to consider all of the possible types of graphs that we would need to generate for this lab. If you are only interested in some of the graphs you can press the play icon in the chunk, copy the section of code to a new r mark down file, or find the plot you want write x1 = before the plot code then copy: 
+
+library(ggplot2)
+ggsave('file.name.png', plot = x1, device = 'png', path = 'C:\\Users\\Arthur\\255E\\Neural_R\\plot_output')
+
+this will save the plot as a .png file in the same directory as the Experiment and control files were placed in a folder entitled plot_output. 
+
 
 1. Imports multiple.csv files for both experiment and control and creates a data frame of all .csv files for each (Exp, and Control). The name of the file is used to organize the information within the data frame. 
 
-2. Calculates the percent variation from baseline for Baseline, peak, SR, and minimum tension in seperate columns for experiment and control. 
+2. Calculates the percent change from baseline for resting discharge, DP, IST, FST, DI, 50 hz vibrations, 100 hz vibrations in seperate columns for experiment and control. 
 
-3. Produces a combination line plot (10 sec. before static stretch (baseline tension), peak tension, average tension 3.25-3.75 of 4 sec. static stretch, and minimum tension) that shows the percent variation from baseline (first 20 minutes of experiment) over time of the experiment and contains a legend for the date of each trial. Each graph is produced independently as well as grouped multi-plots of treatment and control. 
+3. Produces combination line plots for Resting discharge, DP, IST, FST, DI, 50 hz vibrations, 100 hz vibrations that shows the percent change from baseline (first 20 minutes of experiment) over time of the experiment and contains a legend for the date of each trial. Each graph is produced independently as well as grouped multi-plots of treatment and control. 
+
+
+
+
+
+
+
 
 4. Produces a line plot of averages compared to time of experiment for multiple trials for average tension 3.25-3.75 of 4 sec. static stretch with error bars. This code will produce a graph of averages for treatment and control, a single plot of averages with two lines with error bars for treatment and control, and both individual graphs of average treatment and control faceted together.  
 
@@ -31,8 +49,7 @@ note:
 Required packages: ggplot2, dplyr, splitstackshape, reshape, grid, png.
 
 
-###Installing Packages
-this chunk lists packages that are required for the code to function. All of the items in this chunk are commented out so that the r markdown can knit.  
+### setting the working directory 
 
 ```{r directory}
 #set user directory by copying line 40 to console
@@ -42,7 +59,8 @@ setwd("C:/Users/Arthur/255E")
 
 ```
 
-
+###Installing Packages
+this chunk lists packages that are required for the code to function. All of the items in this chunk are commented out so that the r markdown can knit. The packages should only need to be installed the first time the code is used to ensure the code wil perform the appropriate functions.   
 
 ```{r packageInstall}
 # Packages necessary for this r code
@@ -92,7 +110,8 @@ A folder named Neural_R was created so that multiple .csv files could be placed 
 
 
 #myfiles is a new data frame for all .csv files from Experiment folder 
-myfiles=dir(path = "C:/Users/Arthur/255E/Neural_R//Experiment", pattern = "*.csv$", all.files = TRUE, full.names = TRUE)
+myfiles=dir(path = "C:/Users/Arthur/255E/Neural_R/Experiment", pattern = "*.csv$", all.files = TRUE, full.names = TRUE)
+
 
 #for loop loops over myfiles
 
@@ -356,27 +375,17 @@ con2 = con1 %>%
 Control$pcb.resting.discharge = Control$Resting.discharge / Control$avg_reseting.discharge
 
 
- #finding the percent variation from baseline in DP
+ #finding the percent change from baseline in DP
 
 con3 = con1 %>%
   group_by(Trial)%>%
 summarise(avg_DP = mean(DP, na.rm = TRUE))
 
 
- Control$avg_DP = con3$avg_avg_DP[match(Control$Trial, con3$Trial)]
+ Control$avg_DP = con3$avg_DP[match(Control$Trial, con3$Trial)]
  
  Control$pcb.DP = Control$DP / Control$avg_DP
  
- 
- 
-
-
-
-
-
-
- 
-
  
   #finding the percent change form baseline in IST
  
@@ -386,29 +395,66 @@ summarise(avg_DP = mean(DP, na.rm = TRUE))
   summarise(avg_IST = mean(IST, na.rm = TRUE))
 
 
- Control$avg_IST = con4$avg_IST[match(Control$Trial, con2$Trial)]
+ Control$avg_IST = con4$avg_IST[match(Control$Trial, con4$Trial)]
  
  Control$pcb.IST = Control$IST / Control$avg_IST
 
  
-
- 
- 
- 
- 
- 
-  # finding the percent variation from baseline in Minimum values 
+  #finding the percent change form baseline in FST
   
  con5 = con1 %>%
   group_by(Trial)%>%
-  summarise(avg_BSL.min = mean(Min.value, na.rm = TRUE))
+  summarise(avg_FST = mean(FST, na.rm = TRUE))
 
 
- Control$avg_BSL.min = con5$avg_BSL.min[match(Control$Trial, con2$Trial)]
+ Control$avg_FST = con5$avg_FST[match(Control$Trial, con5$Trial)]
  
- Control$pvb.min = Control$Min.value / Control$avg_BSL.min
+ Control$pcb.FST = Control$FST / Control$avg_FST
 
  
+ 
+ # finding the percent variation from baseline in DI
+
+ 
+  
+ con6 = con1 %>%
+  group_by(Trial)%>%
+  summarise(avg_DI = mean(DI, na.rm = TRUE))
+
+
+ Control$avg_DI = con6$avg_DI[match(Control$Trial, con6$Trial)]
+ 
+ Control$pcb.DI = Control$DI / Control$avg_DI
+ 
+  
+ # finding the percent change from baseline in 50Hz vibrations
+
+ 
+  
+ con7 = con1 %>%
+  group_by(Trial)%>%
+  summarise(avg_50hz = mean(X50hz.frequency, na.rm = TRUE))
+
+
+ Control$avg_50hz = con7$avg_50hz[match(Control$Trial, con7$Trial)]
+ 
+ Control$pcb.50hz = Control$X50hz.frequency / Control$avg_50hz
+ 
+ 
+  
+ # finding the percent change from baseline in 100 Hz vibrations
+
+ 
+  
+ con8 = con1 %>%
+  group_by(Trial)%>%
+  summarise(avg_100hz = mean(X100hz.frequency, na.rm = TRUE))
+
+
+ Control$avg_100hz = con8$avg_100hz[match(Control$Trial, con8$Trial)]
+ 
+ Control$pcb.100hz = Control$X100hz.frequency / Control$avg_100hz  
+
  
  library(splitstackshape)
  
@@ -420,8 +466,7 @@ Control$ramp.num = Control5$.id
 ``` 
 ###Combination line plot
 
- Produces a combination line plot (10 sec. before static stretch (baseline tension), peak tension, average tension 3.25-3.27 of 4 sec. static stretch, and minimum tension) that shows the percent variation from baseline (first 20 minutes of experiment) over time of the experiemnt and contains a legend for the date of each trial. Individual graphs are produced for baseline, peak, SR and minimum tension for both experiment and control.  
-
+ Produces a combination line plot for resting discharge, DP, IST, FST, DI, 50 hz vibrations, 100 hz vibrations. 
 ```{r CombinationLineplot, fig.height = 7, fig.width= 9}
 
 
@@ -442,8 +487,20 @@ ggplot(Exp, aes(x= ramp.num, y= pcb.resting.discharge, color = Trial)) +
   theme(plot.title = element_text(hjust=0.5)) +
   scale_x_continuous("Ramp number", breaks = round(seq(min(Exp$ramp.num), max(Exp$ramp.num), by=2),1))+
   theme(axis.text.x = element_text(angle = 45, hjust = 1))+
-  scale_y_continuous("Percent change from baseline",labels = scales::percent, breaks = round(seq(min(Exp$pcb.resting.discharge), max(Exp$pcb.resting.discharge), by = 0.1),1)) 
+  scale_y_continuous("Percent change from baseline",labels = scales::percent, breaks = round(seq(min(Exp$pcb.resting.discharge), max(Exp$pcb.resting.discharge), by = 0.5),1)) 
   
+
+#resting discharge
+
+ggplot(Exp, aes(x= ramp.num, y= pcb.resting.discharge, color = Trial)) +
+    geom_point()+
+  geom_line()+
+  geom_smooth(method ="lm", se=FALSE, color = "black", aes (group = 1))+ 
+  ggtitle("Resting Discharge")+
+  theme(plot.title = element_text(hjust=0.5)) +
+  scale_x_continuous("Ramp number", breaks = round(seq(min(Exp$ramp.num), max(Exp$ramp.num), by=2),1))+
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))+
+  scale_y_continuous("Percent change from baseline",labels = scales::percent, breaks = round(seq(min(Exp$pcb.resting.discharge), max(Exp$pcb.resting.discharge), by = 0.5),1)) 
   
 
 #plot of DP
@@ -508,7 +565,7 @@ ggplot(Exp, aes(x= ramp.num, y= pcb.50hz, color = Trial)) +
   theme(plot.title = element_text(hjust=0.5)) +
   scale_x_continuous("Vibration number", breaks = round(seq(min(Exp$ramp.num), max(Exp$ramp.num), by=2),1))+
   theme(axis.text.x = element_text(angle = 45, hjust = 1))+
-  scale_y_continuous("Percent change from baseline",labels = scales::percent, breaks = round(seq(min(Exp$pcb.50hz), max(Exp$pcb.50hz), by = 0.1),1)) 
+  scale_y_continuous("Percent change from baseline",labels = scales::percent, breaks = round(seq(min(Exp$pcb.50hz), max(Exp$pcb.50hz), by = 0.5),1)) 
 
 
 #plot of 100hz vibrations
@@ -520,67 +577,116 @@ ggplot(Exp, aes(x= ramp.num, y= pcb.100hz, color = Trial)) +
   theme(plot.title = element_text(hjust=0.5)) +
   scale_x_continuous("Vibration number", breaks = round(seq(min(Exp$ramp.num), max(Exp$ramp.num), by=2),1))+
   theme(axis.text.x = element_text(angle = 45, hjust = 1))+
-  scale_y_continuous("Percent change from baseline",labels = scales::percent, breaks = round(seq(min(Exp$pcb.100hz), max(Exp$pcb.100hz), by = 0.1),1)) 
+  scale_y_continuous("Percent change from baseline",labels = scales::percent, breaks = round(seq(min(Exp$pcb.100hz), max(Exp$pcb.100hz), by = 0.5),1)) 
 
+```
+
+
+
+
+```{r controlComboplot,fig.height = 7, fig.width= 9}
 #plot of graphs for control group
 
 
-#BL.Tension
+#resting discharge
 
-ggplot(Control, aes(x= ramp.num, y= pvb.BL.tension, color = Trial)) +
+ggplot(Control, aes(x= ramp.num, y= pcb.resting.discharge, color = Trial)) +
     geom_point()+
      geom_line()+
   geom_smooth(method ="lm", se=FALSE, color = "black", aes (group = 1))+
-  ggtitle("Control Baseline Tension")+
+  ggtitle("Control Resting Discharge")+
   theme(plot.title = element_text(hjust=0.5))+scale_x_continuous("Time(Min.)")+
    scale_x_continuous("Ramp number", breaks = round(seq(min(Control$ramp.num), max(Control$ramp.num), by=2),1))+
   theme(axis.text.x = element_text(angle = 45, hjust = 1))+
-  scale_y_continuous("Percent change from baseline",labels = scales::percent,  breaks = round(seq(min(Control$pvb.BL.tension), max(Control$pvb.BL.tension), by = 0.1),1)) 
+  scale_y_continuous("Percent change from baseline",labels = scales::percent,  breaks = round(seq(min(Control$pcb.resting.discharge), max(Control$pcb.resting.discharge), by = 0.1),1)) 
 
 
 
-#plot of peak tension
+#DP
 
-ggplot(Control, aes(x = ramp.num, y=pvb.peak.tension, color = Trial))+
+ggplot(Control, aes(x = ramp.num, y=pcb.DP, color = Trial))+
     geom_point()+
   geom_line()+
   geom_smooth(method ="lm", se=FALSE, color = "black", aes (group = 1))+
-ggtitle("Control Peak Tension")+
+ggtitle("Control Dynamic Peak")+
   theme(plot.title = element_text(hjust=0.5))+
   scale_x_continuous("Ramp number", breaks = round(seq(min(Control$ramp.num), max(Control$ramp.num), by=2),1))+
   theme(axis.text.x = element_text(angle = 45, hjust = 1))+
-  scale_y_continuous("Percent change from baseline",labels = scales::percent, breaks = round(seq(min(Control$pvb.peak.tension), max(Control$pvb.peak.tension), by = 0.1),1))
+  scale_y_continuous("Percent change from baseline",labels = scales::percent, breaks = round(seq(min(Control$pcb.DP), max(Control$pcb.DP), by = 0.1),1))
   
 
 
-#plot of peak plateu 3.25-3.75
+#IST
 
-ggplot(Control, aes(x=ramp.num, y=pvb.SR, color= Trial))+  
+ggplot(Control, aes(x=ramp.num, y=pcb.IST, color= Trial))+  
   geom_point()+
   geom_line()+
   geom_smooth(method ="lm", se=FALSE, color = "black", aes (group = 1)) +
-  ggtitle("Control SR")+
+  ggtitle("Control IST")+
   theme(plot.title = element_text(hjust=0.5))+
   scale_x_continuous("Ramp number",breaks = round(seq(min(Control$ramp.num), max(Control$ramp.num), by=2),1))+
   theme(axis.text.x = element_text(angle = 45, hjust = 1))+
-  scale_y_continuous("Percent change from baseline",labels = scales::percent, breaks = round(seq(min(Control$pvb.SR), max(Control$pvb.SR), by = 0.1),1))
+  scale_y_continuous("Percent change from baseline",labels = scales::percent, breaks = round(seq(min(Control$pcb.IST), max(Control$pcb.IST), by = 0.1),1))
 
-#plot of min tension
+#FST
 
-ggplot(Control, aes(x=ramp.num, y=pvb.min, color = Trial))+
+ggplot(Control, aes(x=ramp.num, y=pcb.FST, color = Trial))+
   geom_point()+
   geom_line()+
   geom_smooth(method ="lm", se=FALSE, color = "black", aes (group = 1))+
-  ggtitle("Control Minimum")+
+  ggtitle("Control FST")+
   theme(plot.title = element_text(hjust=0.5))+
   scale_x_continuous("Ramp number", breaks = round(seq(min(Control$ramp.num), max(Control$ramp.num), by=2),1))+
   theme(axis.text.x = element_text(angle = 45, hjust = 1))+
-  scale_y_continuous("Percent change from baseline",labels = scales::percent, breaks = round(seq(min(Control$pvb.min), max(Control$pvb.min), by = 2),1))
+  scale_y_continuous("Percent change from baseline",labels = scales::percent, breaks = round(seq(min(Control$pcb.FST), max(Control$pcb.FST), by = 2),1))
   
 
 
+#plot of DI
+ggplot(Control, aes(x= ramp.num, y= pcb.DI, color = Trial)) +
+    geom_point()+
+  geom_line()+
+  geom_smooth(method ="lm", se=FALSE, color = "black", aes (group = 1))+ 
+  ggtitle("Control DI")+
+  theme(plot.title = element_text(hjust=0.5)) +
+  scale_x_continuous("Ramp number", breaks = round(seq(min(Control$ramp.num), max(Control$ramp.num), by=2),1))+
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))+
+  scale_y_continuous("Percent change from baseline",labels = scales::percent, breaks = round(seq(min(Control$pcb.DI), max(Control$pcb.DI), by = 0.1),1)) 
+  
 
 
+#plot of 50hZ vibrations
+ggplot(Control, aes(x= ramp.num, y= pcb.50hz, color = Trial)) +
+    geom_point()+
+  geom_line()+
+  geom_smooth(method ="lm", se=FALSE, color = "black", aes (group = 1))+ 
+  ggtitle("50 Hz Vibrations Control")+
+  theme(plot.title = element_text(hjust=0.5)) +
+  scale_x_continuous("Vibration number", breaks = round(seq(min(Control$ramp.num), max(Control$ramp.num), by=2),1))+
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))+
+  scale_y_continuous("Percent change from baseline",labels = scales::percent, breaks = round(seq(min(Control$pcb.50hz), max(Control$pcb.50hz), by = 0.5),1)) 
+
+
+#plot of 100hz vibrations
+ggplot(Control, aes(x= ramp.num, y= pcb.100hz, color = Trial)) +
+    geom_point()+
+  geom_line()+
+  geom_smooth(method ="lm", se=FALSE, color = "black", aes (group = 1))+ 
+  ggtitle("100 Hz vibrations Control")+
+  theme(plot.title = element_text(hjust=0.5)) +
+  scale_x_continuous("Vibration number", breaks = round(seq(min(Control$ramp.num), max(Control$ramp.num), by=2),1))+
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))+
+  scale_y_continuous("Percent change from baseline",labels = scales::percent, breaks = round(seq(min(Control$pcb.100hz), max(Control$pcb.100hz), by = 0.5),1)) 
+
+
+
+
+
+
+
+#saving plots to folder 
+#library(ggplot2)
+#ggsave('file.name.png', plot = x1, device = 'png', path = 'C:\\Users\\Arthur\\255E\\Neural_R\\plot_output')
 
 ```
 
@@ -647,135 +753,244 @@ multiplot <- function(..., plotlist=NULL, file, cols=1, layout=NULL) {
 library(ggplot2)
 
 
-#Baseline tension
+#resting discharge
 
-a1 = ggplot(Exp, aes(x= ramp.num, y= pvb.BL.tension, color = Trial)) +
+a1 = ggplot(Exp, aes(x= ramp.num, y= pcb.resting.discharge, color = Trial)) +
     geom_point()+
   geom_line()+
   geom_smooth(method ="lm", se=FALSE, color = "black", aes (group = 1))+ 
-  ggtitle("Baseline Tension")+
+  ggtitle("Resting Discharge")+
   theme(plot.title = element_text(hjust=0.5)) +
-  scale_x_continuous("Ramp", breaks = round(seq(min(Exp$ramp.num), max(Exp$ramp.num), by=2),1))+
+  scale_x_continuous("Ramp number", breaks = round(seq(min(Exp$ramp.num), max(Exp$ramp.num), by=2),1))+
   theme(axis.text.x = element_text(angle = 45, hjust = 1))+
-  scale_y_continuous("Percent change from baseline",labels = scales::percent,  breaks = round(seq(min(Exp$pvb.BL.tension), max(Exp$pvb.BL.tension), by = 0.1),1))+
+  scale_y_continuous("Percent change from baseline",labels = scales::percent, breaks = round(seq(min(Exp$pcb.resting.discharge), max(Exp$pcb.resting.discharge), by = 0.5),1))+
+  theme(legend.position = "none")
+
+#plot of DP
+
+b1 = ggplot(Exp, aes(x = ramp.num, y=pcb.DP, color = Trial)) +
+    geom_point()+
+  geom_line()+
+  geom_smooth(method ="lm", se=FALSE, color = "black", aes (group = 1))+
+  ggtitle("Dynamic Peak")+
+theme(plot.title = element_text(hjust=0.5))+
+  scale_x_continuous("Ramp number", breaks = round(seq(min(Exp$ramp.num), max(Exp$ramp.num), by=2),1))+
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))+
+  scale_y_continuous("Percent change from baseline", labels = scales::percent, breaks = round(seq(min(Exp$pcb.DP), max(Exp$pcb.DP), by = 0.1),1))+
   theme(legend.position = "none")
 
 
-#plot of peak tension
 
-b1 = ggplot(Exp, aes(x = ramp.num, y=pvb.peak.tension, color = Trial)) +
+#plot of IST
+
+c1 = ggplot(Exp, aes(x=ramp.num, y=pcb.IST, color= Trial))+
     geom_point()+
   geom_line()+
   geom_smooth(method ="lm", se=FALSE, color = "black", aes (group = 1))+
-  ggtitle("Peak Tension")+
-theme(plot.title = element_text(hjust=0.5))+
-  scale_x_continuous("Ramp", breaks = round(seq(min(Exp$ramp.num), max(Exp$ramp.num), by=2),1))+
-  theme(axis.text.x = element_text(angle = 45, hjust = 1))+
-  scale_y_continuous("Percent change from baseline", labels = scales::percent, breaks = round(seq(min(Exp$pvb.peak.tension), max(Exp$pvb.peak.tension), by = 1.2),1))+theme(legend.position = "none")
-
-
-
-#plot of peak plateu 3.25-3.75
-
-c1 = ggplot(Exp, aes(x=ramp.num, y=pvb.SR, color= Trial))+
-    geom_point()+
-  geom_line()+
-  geom_smooth(method ="lm", se=FALSE, color = "black", aes (group = 1))+
-  ggtitle("SR") +
+  ggtitle("IST") +
   theme(plot.title = element_text(hjust=0.5))+
-  scale_x_continuous("Ramp",breaks = round(seq(min(Exp$ramp.num), max(Exp$ramp.num), by=2),1))+
+  scale_x_continuous("Ramp number",breaks = round(seq(min(Exp$ramp.num), max(Exp$ramp.num), by=2),1))+
   theme(axis.text.x = element_text(angle = 45, hjust = 1))+
-  scale_y_continuous("Percent change from baseline", labels = scales::percent, breaks = round(seq(min(Exp$pvb.SR), max(Exp$pvb.SR), by = 0.8),1))+theme(legend.position = "none")
+  scale_y_continuous("Percent change from baseline", labels = scales::percent, breaks = round(seq(min(Exp$pcb.IST), max(Exp$pcb.IST), by = 0.1),1))+
+  theme(legend.position = "none")
 
 
-#plot of min tension
+#plot of FST
 
-d1 = ggplot(Exp, aes(x=ramp.num, y=pvb.min, color = Trial))+
+d1 = ggplot(Exp, aes(x=ramp.num, y=pcb.FST, color = Trial))+
     geom_point()+
   geom_line()+
   geom_smooth(method ="lm", se=FALSE, color = "black", aes (group = 1)) +
-  ggtitle("Minimum")+
+  ggtitle("FST")+
   theme(plot.title = element_text(hjust=0.5))+
-   scale_x_continuous("Ramp", breaks = round(seq(min(Exp$ramp.num), max(Exp$ramp.num), by=2),1))+
+   scale_x_continuous("Ramp number", breaks = round(seq(min(Exp$ramp.num), max(Exp$ramp.num), by=2),1))+
   theme(axis.text.x = element_text(angle = 45, hjust = 1))+
-  scale_y_continuous("Percent change from baseline",labels = scales::percent, breaks = round(seq(min(Exp$pvb.min), max(Exp$pvb.min), by = 2),1))
+  scale_y_continuous("Percent change from baseline",labels = scales::percent, breaks = round(seq(min(Exp$pcb.FST), max(Exp$pcb.FST), by = 0.1),1))+
+  theme(legend.position = "none")
 
+
+#plot of DI
+e1 = ggplot(Exp, aes(x= ramp.num, y= pcb.DI, color = Trial)) +
+    geom_point()+
+  geom_line()+
+  geom_smooth(method ="lm", se=FALSE, color = "black", aes (group = 1))+ 
+  ggtitle("DI")+
+  theme(plot.title = element_text(hjust=0.5)) +
+  scale_x_continuous("Ramp number", breaks = round(seq(min(Exp$ramp.num), max(Exp$ramp.num), by=2),1))+
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))+
+  scale_y_continuous("Percent change from baseline",labels = scales::percent, breaks = round(seq(min(Exp$pcb.DI), max(Exp$pcb.DI), by = 0.4),1))+
+  theme(legend.position = "none")
+  
+
+
+#plot of 50hZ vibrations
+f1 = ggplot(Exp, aes(x= ramp.num, y= pcb.50hz, color = Trial)) +
+    geom_point()+
+  geom_line()+
+  geom_smooth(method ="lm", se=FALSE, color = "black", aes (group = 1))+ 
+  ggtitle("50 Hz Vibrations")+
+  theme(plot.title = element_text(hjust=0.5)) +
+  scale_x_continuous("Vibration number", breaks = round(seq(min(Exp$ramp.num), max(Exp$ramp.num), by=2),1))+
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))+
+  scale_y_continuous("Percent change from baseline",labels = scales::percent, breaks = round(seq(min(Exp$pcb.50hz), max(Exp$pcb.50hz), by = 0.6),1))+
+  theme(legend.position = "none")
+
+
+#plot of 100hz vibrations
+g1 = ggplot(Exp, aes(x= ramp.num, y= pcb.100hz, color = Trial)) +
+    geom_point()+
+  geom_line()+
+  geom_smooth(method ="lm", se=FALSE, color = "black", aes (group = 1))+ 
+  ggtitle("100 Hz vibrations")+
+  theme(plot.title = element_text(hjust=0.5)) +
+  scale_x_continuous("Vibration number", breaks = round(seq(min(Exp$ramp.num), max(Exp$ramp.num), by=2),1))+
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))+
+  scale_y_continuous("Percent change from baseline",labels = scales::percent, breaks = round(seq(min(Exp$pcb.100hz), max(Exp$pcb.100hz), by = 0.6),1))
 
   
 
 #use the multiplot function to combine all plots in multiplot function
 
-multiplot(a1,b1,c1,d1, cols=2)
-
+multiplot(a1,b1,c1,d1,e1,f1,g1, cols=3)
+```
 #creating labels for control plot 
 
-a_2 = ggplot(Control, aes(x= ramp.num, y= pvb.BL.tension, color = Trial)) +
+multiplot control
+
+```{r MultiplotControl, fig.height= 10, fig.width=12}
+
+
+# multiple plots combined for control
+
+#create labels for each plot Experiment 
+
+library(ggplot2)
+
+
+#resting discharge
+
+a2 = ggplot(Control, aes(x= ramp.num, y= pcb.resting.discharge, color = Trial)) +
     geom_point()+
-     geom_line()+
-  geom_smooth(method ="lm", se=FALSE, color = "black", aes (group = 1))+
-  ggtitle("Control Baseline Tension")+
-  theme(plot.title = element_text(hjust=0.5))+scale_x_continuous("Time(Min.)")+
-   scale_x_continuous("Ramp", breaks = round(seq(min(Control$ramp.num), max(Control$ramp.num), by=2),1))+
+  geom_line()+
+  geom_smooth(method ="lm", se=FALSE, color = "black", aes (group = 1))+ 
+  ggtitle("Resting Discharge Control")+
+  theme(plot.title = element_text(hjust=0.5)) +
+  scale_x_continuous("Ramp number", breaks = round(seq(min(Exp$ramp.num), max(Exp$ramp.num), by=2),1))+
   theme(axis.text.x = element_text(angle = 45, hjust = 1))+
-  scale_y_continuous("Percent change from baseline", labels = scales::percent, breaks = round(seq(min(Control$pvb.BL.tension), max(Control$pvb.BL.tension), by = 0.1),1)) +theme(legend.position = "none")
+  scale_y_continuous("Percent change from baseline",labels = scales::percent, breaks = round(seq(min(Exp$pcb.resting.discharge), max(Exp$pcb.resting.discharge), by = 0.5),1))+
+  theme(legend.position = "none")
 
+#plot of DP
 
-#plot of peak tension
-
-b_2 = ggplot(Control, aes(x = ramp.num, y=pvb.peak.tension, color = Trial))+
+b2 = ggplot(Control, aes(x = ramp.num, y=pcb.DP, color = Trial)) +
     geom_point()+
   geom_line()+
   geom_smooth(method ="lm", se=FALSE, color = "black", aes (group = 1))+
-ggtitle("Control Peak Tension")+
-  theme(plot.title = element_text(hjust=0.5))+
-  scale_x_continuous("Ramp", breaks = round(seq(min(Control$ramp.num), max(Control$ramp.num), by=2),1))+
+  ggtitle("Dynamic Peak Control")+
+theme(plot.title = element_text(hjust=0.5))+
+  scale_x_continuous("Ramp number", breaks = round(seq(min(Exp$ramp.num), max(Exp$ramp.num), by=2),1))+
   theme(axis.text.x = element_text(angle = 45, hjust = 1))+
-  scale_y_continuous("Percent change from baseline",labels = scales::percent, breaks = round(seq(min(Control$pvb.peak.tension), max(Control$pvb.peak.tension), by = 1.2),1)) +theme(legend.position = "none")
+  scale_y_continuous("Percent change from baseline", labels = scales::percent, breaks = round(seq(min(Exp$pcb.DP), max(Exp$pcb.DP), by = 0.1),1))+
+  theme(legend.position = "none")
 
 
 
-#plot of peak plateu 3.25-3.75
+#plot of IST
 
-c_2 = ggplot(Control, aes(x=ramp.num, y=pvb.SR, color= Trial))+  
-  geom_point()+
+c2 = ggplot(Control, aes(x=ramp.num, y=pcb.IST, color= Trial))+
+    geom_point()+
+  geom_line()+
+  geom_smooth(method ="lm", se=FALSE, color = "black", aes (group = 1))+
+  ggtitle("IST Control") +
+  theme(plot.title = element_text(hjust=0.5))+
+  scale_x_continuous("Ramp number",breaks = round(seq(min(Exp$ramp.num), max(Exp$ramp.num), by=2),1))+
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))+
+  scale_y_continuous("Percent change from baseline", labels = scales::percent, breaks = round(seq(min(Exp$pcb.IST), max(Exp$pcb.IST), by = 0.1),1))+
+  theme(legend.position = "none")
+
+
+#plot of FST
+
+d2 = ggplot(Control, aes(x=ramp.num, y=pcb.FST, color = Trial))+
+    geom_point()+
   geom_line()+
   geom_smooth(method ="lm", se=FALSE, color = "black", aes (group = 1)) +
-  ggtitle("Control SR")+
+  ggtitle("FST Control")+
   theme(plot.title = element_text(hjust=0.5))+
-  scale_x_continuous("Ramp",breaks = round(seq(min(Control$ramp.num), max(Control$ramp.num), by=2),1))+
+   scale_x_continuous("Ramp number", breaks = round(seq(min(Exp$ramp.num), max(Exp$ramp.num), by=2),1))+
   theme(axis.text.x = element_text(angle = 45, hjust = 1))+
-  scale_y_continuous("Percent change from baseline",labels = scales::percent, breaks = round(seq(min(Control$pvb.SR), max(Control$pvb.SR), by = 0.8),1))+theme(legend.position = "none")
+  scale_y_continuous("Percent change from baseline",labels = scales::percent, breaks = round(seq(min(Exp$pcb.FST), max(Exp$pcb.FST), by = 0.1),1))+
+  theme(legend.position = "none")
 
-#plot of min tension
 
-d_2 = ggplot(Control, aes(x=ramp.num, y=pvb.min, color = Trial))+
-  geom_point()+
+#plot of DI
+e2 = ggplot(Control, aes(x= ramp.num, y= pcb.DI, color = Trial)) +
+    geom_point()+
   geom_line()+
-  geom_smooth(method ="lm", se=FALSE, color = "black", aes (group = 1))+
-  ggtitle("Control Minimum")+
-  theme(plot.title = element_text(hjust=0.5))+
-  scale_x_continuous("Ramp", breaks = round(seq(min(Control$ramp.num), max(Control$ramp.num), by=2),1))+
+  geom_smooth(method ="lm", se=FALSE, color = "black", aes (group = 1))+ 
+  ggtitle("DI Control")+
+  theme(plot.title = element_text(hjust=0.5)) +
+  scale_x_continuous("Ramp number", breaks = round(seq(min(Exp$ramp.num), max(Exp$ramp.num), by=2),1))+
   theme(axis.text.x = element_text(angle = 45, hjust = 1))+
-  scale_y_continuous("Percent change from baseline",labels = scales::percent, breaks = round(seq(min(Control$pvb.min), max(Control$pvb.min), by = 2),1))
+  scale_y_continuous("Percent change from baseline",labels = scales::percent, breaks = round(seq(min(Exp$pcb.DI), max(Exp$pcb.DI), by = 0.4),1))+
+  theme(legend.position = "none")
+  
 
 
+#plot of 50hZ vibrations
+f2 = ggplot(Control, aes(x= ramp.num, y= pcb.50hz, color = Trial)) +
+    geom_point()+
+  geom_line()+
+  geom_smooth(method ="lm", se=FALSE, color = "black", aes (group = 1))+ 
+  ggtitle("50 Hz Vibrations Control")+
+  theme(plot.title = element_text(hjust=0.5)) +
+  scale_x_continuous("Vibration number", breaks = round(seq(min(Exp$ramp.num), max(Exp$ramp.num), by=2),1))+
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))+
+  scale_y_continuous("Percent change from baseline",labels = scales::percent, breaks = round(seq(min(Exp$pcb.50hz), max(Exp$pcb.50hz), by = 0.6),1))+
+  theme(legend.position = "none")
 
-  multiplot(a_2,b_2,c_2,d_2, cols = 2)
+
+#plot of 100hz vibrations
+g2 = ggplot(Control, aes(x= ramp.num, y= pcb.100hz, color = Trial)) +
+    geom_point()+
+  geom_line()+
+  geom_smooth(method ="lm", se=FALSE, color = "black", aes (group = 1))+ 
+  ggtitle("100 Hz vibrations Control")+
+  theme(plot.title = element_text(hjust=0.5)) +
+  scale_x_continuous("Vibration number", breaks = round(seq(min(Exp$ramp.num), max(Exp$ramp.num), by=2),1))+
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))+
+  scale_y_continuous("Percent change from baseline",labels = scales::percent, breaks = round(seq(min(Exp$pcb.100hz), max(Exp$pcb.100hz), by = 0.6),1))
+
+  
+
+#use the multiplot function to combine all plots in multiplot function
+
+multiplot(a2,b2,c2,d2,e2,f2,g2, cols=3)
 
 
+#library(ggplot2)
+#saving plots to folder 
 
+#ggsave('file.name.png', plot = last_plot(), device = 'png', path = 'C:\\Users\\Arthur\\255E\\Neural_R\\plot_output')
+
+```
+
+###side by side plot of Exp and Control
+
+
+```{r ControlExpMultiplot, fig.height= 15, fig.width=11}
 #creates two columns to compare treatment and control
 
 #creates facet of multiple graphs comparing treatment to control
 
-#multiplot(a1,b1,c1,d1,a_2,b_2,c_2,d_2, cols =2)
+multiplot(a1,b1,c1,d1,e1,f1,g1,a2,b2,c2,d2,e2,f2,g2, cols =2)
 
 
-
+  
 ```
 ###Plot of averages
 
- Produces a line plot of averages compared to time of experiment for multiple trials for average tension 3.25-3.75 of 4 sec. static stretch with error bars. This code will produce a graph of averages for treatment and control, a single plot of averages with two lines with error bars for treatment and control, and both individual graphs of average treatment and control faceted together.   
+ Produces a line plot of averages compared to time of experiment for multiple trials for FST with error bars. This code will produce a graph of averages for treatment and control, a single plot of averages with two lines with error bars for treatment and control, and both individual graphs of average treatment and control faceted together.   
 
 ```{r plotAverages,fig.height = 7, fig.width= 8}
 
@@ -790,12 +1005,12 @@ library(dplyr)
 
 Exp8 = Exp %>%
   group_by(Macro)%>%
-  summarise(avg.all.macro = mean(average.of.all.interval.points, na.rm = TRUE))
+  summarise(avg.all.macro = mean(FST, na.rm = TRUE))
 
 
  Exp8_sd = Exp%>%
   group_by(Macro)%>%
-  summarise(sd = sd(average.of.all.interval.points, na.rm = TRUE))
+  summarise(sd = sd(FST, na.rm = TRUE))
 
  Exp8$sd = Exp8_sd$sd
  
@@ -812,11 +1027,11 @@ Exp10 = as.data.frame(table(Exp$Macro))
  
  Con8 = Control %>%
   group_by(Macro)%>%
-  summarise(avg.all.macro = mean(average.of.all.interval.points, na.rm = TRUE))
+  summarise(avg.all.macro = mean(FST, na.rm = TRUE))
 
  Con8_sd = Control%>%
   group_by(Macro)%>%
-  summarise(sd = sd(average.of.all.interval.points, na.rm = TRUE))
+  summarise(sd = sd(FST, na.rm = TRUE))
 
  Con8$sd = Con8_sd$sd
  
@@ -949,11 +1164,11 @@ Produces multiple dot plots with error bars. Points represent the average value 
 library(dplyr)
 Exp_11 = Exp%>%
   group_by(Macro)%>%
-  summarise(avg = mean(BL.tension, na.rm = TRUE))
+  summarise(avg = mean(FST, na.rm = TRUE))
  
 Exp_12 = Exp%>%
   group_by(Macro)%>%
-  summarise(SD = sd(BL.tension, na.rm=TRUE))
+  summarise(SD = sd(FST, na.rm=TRUE))
 
 Exp_13 = as.data.frame(table(Exp$Macro))
 Exp_11$SD = Exp_12$SD
@@ -965,7 +1180,7 @@ Exp_11$ymax = Exp_11$avg + Exp_11$SE
 Exp_11$type = "Drug"
 
 
-#plot of average for macro BL. Tension per macro scatter plot with errorbars Experiment 
+#plot of average for macro FST per macro scatter plot with errorbars Experiment 
 
 
 
@@ -1069,14 +1284,269 @@ ggplot(Exp_Con11, aes(x=Exp_Con11$type, y=avg.all.macro, group = num.type, color
   labs(x="Experiment type\n", y = "Average of all Macros\n")
  
  
+
+```
+# dot plot for percent change from baseline for vibrations 50 hz and 100hz compared to control
+
+```{r dotPlotvibrations}
+
+#Experimental group 50 hz subsetting and calculation of mean, standard deviation, and standard error. 
+
+library(dplyr)
+Exp_17 = Exp%>%
+  group_by(Macro)%>%
+  summarise(avg = mean(pcb.50hz, na.rm = TRUE))
  
-  
+Exp_18 = Exp%>%
+  group_by(Macro)%>%
+  summarise(SD = sd(pcb.50hz, na.rm=TRUE))
+
+Exp_19 = as.data.frame(table(Exp$Macro))
+Exp_17$SD = Exp_18$SD
+Exp_17$n = as.numeric(Exp_19$Freq)
+Exp_17$sqrt = sqrt(Exp_17$n)
+Exp_17$SE = Exp_17$SD / Exp_17$sqrt
+Exp_17$ymin = Exp_17$avg - Exp_17$SE
+Exp_17$ymax = Exp_17$avg + Exp_17$SE
+Exp_17$type = "Drug"
+
+
+
+#Experimental group 100 hz subsetting and calculations of mean, standard deviation, and standard error
+Exp_14 = Exp%>%
+  group_by(Macro)%>%
+  summarise(avg = mean(pcb.100hz, na.rm = TRUE))
+
+
+Exp_15 = Exp%>%
+  group_by(Macro)%>%
+  summarise(SD = sd(pcb.100hz, na.rm=TRUE))
+
+Exp_16 = as.data.frame(table(Exp$Macro))
+Exp_14$SD = Exp_15$SD
+Exp_14$n = as.numeric(Exp_16$Freq)
+Exp_14$sqrt = sqrt(Exp_14$n)
+Exp_14$SE = Exp_14$SD / Exp_14$sqrt
+Exp_14$ymin = Exp_14$avg - Exp_14$SE
+Exp_14$ymax = Exp_14$avg + Exp_14$SE
+Exp_14$type = "Drug"
+
+
+#Control group 50 hz subsetting and calculations of mean, standard deviation, and standard error
+
+ 
+ Con18 = Control %>%
+  group_by(Macro)%>%
+  summarise(avg = mean(pcb.50hz, na.rm = TRUE))
+
+ Con18_sd = Control%>%
+  group_by(Macro)%>%
+  summarise(sd = sd(FST, na.rm = TRUE))
+
+
+ 
+ 
+ 
+  Con18$sd = Con8_sd$sd
+ 
+ 
+Con10 = as.data.frame(table(Control$Macro))
+   Con9 =  sqrt(Con10$Freq)
+   Con8$SE = Con8$sd / Con9
+
+   Con8$ymin = Con8$avg.all.macro - Con8$SE
+   Con8$ymax = Con8$avg.all.macro + Con8$SE
+   
+    Con8$type = "Control"
+
+
+
+
+
+
+
+
+#groups the ramp number and takes the average of all SR values for both experiment and control
+
+#experimnet group calculations
+
+#experiment subset and calculation of mean, standard deviation, and standard error. 
+
+library(dplyr)
+
+
+Exp8 = Exp %>%
+  group_by(Macro)%>%
+  summarise(avg.all.macro = mean(FST, na.rm = TRUE))
+
+
+ Exp8_sd = Exp%>%
+  group_by(Macro)%>%
+  summarise(sd = sd(FST, na.rm = TRUE))
+
+ Exp8$sd = Exp8_sd$sd
+ 
+Exp10 = as.data.frame(table(Exp$Macro))
+  Exp9 =  sqrt(Exp10$Freq)
+ Exp8$SE = Exp8$sd / Exp9
+
+ Exp8$ymin = Exp8$avg.all.macro - Exp8$SE
+ Exp8$ymax = Exp8$avg.all.macro + Exp8$SE
+ 
+ Exp8$type = "Drug"
+ 
+#control subset and calculation of mean, standard deviation, and standard error.  
+ 
+ Con8 = Control %>%
+  group_by(Macro)%>%
+  summarise(avg.all.macro = mean(FST, na.rm = TRUE))
+
+ Con8_sd = Control%>%
+  group_by(Macro)%>%
+  summarise(sd = sd(FST, na.rm = TRUE))
+
+ Con8$sd = Con8_sd$sd
+ 
+ 
+Con10 = as.data.frame(table(Control$Macro))
+   Con9 =  sqrt(Con10$Freq)
+   Con8$SE = Con8$sd / Con9
+
+   Con8$ymin = Con8$avg.all.macro - Con8$SE
+   Con8$ymax = Con8$avg.all.macro + Con8$SE
+   
+    Con8$type = "Control"
+ 
+ 
+    
+    #binds data frame to compare treatment and control in plot
+     Exp_Con = rbind(Exp8, Con8)
+ 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+#plot of average for macro FST per macro scatter plot with errorbars Experiment 
+
+
+
+library(ggplot2)
+
+Exp8$num.type = 1
+Exp8$min1 = mean(Exp8$ymin)
+Exp8$max1 = mean(Exp8$ymax)
+
+
+   ggplot(Exp8,aes(x=num.type, y=avg.all.macro, group = type, color = Macro)) + 
+   geom_errorbar(aes(ymin=min1 , ymax=max1), width= 20) +
+   geom_point()+
+     geom_jitter()+
+     ggtitle("Average SR for Treatment Group\n")+
+  theme(plot.title = element_text(hjust=0.5))+
+  labs(x="Drug\n", y = "Average SR\n")+
+         theme(axis.text.x=element_blank(),
+        axis.ticks.x=element_blank())
+        
+   
+   
+
+   
+#plot of average for macro Bl.Tension per macro scatterplot with errorbars Control    
+
+   Con8$num.type = 1.1
+
+Con8$min1 = mean(Con8$ymin)
+Con8$max1 = mean(Con8$ymax)
+
+
+   ggplot(Con8,aes(x=num.type, y=avg.all.macro, group = type, color = Macro)) + 
+   geom_errorbar(aes(ymin=min1 , ymax=max1), width= 20) +
+   geom_point()+
+     geom_jitter()+
+     ggtitle("Average SR for Control Group\n")+
+  theme(plot.title = element_text(hjust=0.5))+
+  labs(x="Type\n", y = "Average SR\n")+
+        theme(axis.text.x=element_blank(),
+        axis.ticks.x=element_blank())
+   
+
+   
+
+# plot comparing treatment and control scatter plots with errorbars. 
+
+      #for multiplot
+   b3=(ggplot(Con8,aes(x=num.type, y=avg.all.macro, group = type, color = Macro)) + 
+   geom_errorbar(aes(ymin=min1 , ymax=max1), width= 20) +
+   geom_point()+
+     geom_jitter()+
+     ggtitle("Average SR for Control Group\n")+
+  theme(plot.title = element_text(hjust=0.5))+
+  labs(x="Control\n", y = "Average SR\n"))+
+        theme(axis.text.x=element_blank(),
+        axis.ticks.x=element_blank())
+   
+   
+   
+      #for later multiplot
+  a3= (ggplot(Exp8,aes(x=num.type, y=avg.all.macro, group = type, color = Macro)) + 
+   geom_errorbar(aes(ymin=min1 , ymax=max1), width= 20) +
+   geom_point()+
+     geom_jitter()+
+     ggtitle("Average SR versus Time for Treatment Group\n")+
+  theme(plot.title = element_text(hjust=0.5))+
+  labs(x="Drug\n", y = "Average SR\n"))+
+       theme(axis.text.x=element_blank(),
+        axis.ticks.x=element_blank())
+   
+   multiplot(a3,b3)
+   
+   #combining treatment and control using facet
+   
+Exp_Con11 = rbind(Exp8,Con8)
+
+ggplot(Exp_Con11, aes(x=num.type, y=avg.all.macro, group = num.type, color = Macro))+
+  #scale_colour_manual(values = c("steelblue", "darkblue"))+
+  geom_point()+
+  geom_errorbar(aes(ymin=min1, ymax= max1), size=0.5,   
+    width=.25,position=position_dodge(.9))+
+    theme(axis.title.x=element_blank(),
+        axis.text.x=element_blank(),
+        axis.ticks.x=element_blank())+
+#theme(axis.text.x = element_text(angle = 0, hjust = 1))+
+  geom_jitter()+
+  facet_grid(type~.)+
+  labs(x="Experiment type\n", y = "Average of all Macros\n")
+
+
+#side by side experiment and control scatter plot with wrror bars
+
+ggplot(Exp_Con11, aes(x=Exp_Con11$type, y=avg.all.macro, group = num.type, color =Macro))+
+  geom_point()+
+  geom_errorbar(aes(ymin=min1, ymax= max1), size=0.5,   
+    width=.25,position=position_dodge(.9))+
+  geom_jitter()+
+  ggtitle("Average SR for treatment and control")+
+  theme(plot.title = element_text(hjust=0.5))+
+  labs(x="Experiment type\n", y = "Average of all Macros\n")
+ 
 
 ```
 
 ###Line plot with data visulization and standard deviation
 
-Produces a line plot of peak tension as a percent variation from baseline tension over time of experiment. This graph also includes a picture of the afferent firing caused by the first static stretch. The caption of this graph lists the standard deviation values for each 20-minute period of the experiment. 
+Produces a line plot of peak tension as a percent change from FST over time of experiment. This graph also includes a picture of the afferent firing caused by the first static stretch. The caption of this graph lists the standard deviation values for each 20-minute period of the experiment. 
 
 ```{r lineDatavisualization, fig.height = 8, fig.width= 10}
 
@@ -1088,27 +1558,29 @@ library(grid)
 
  Exp8_sd = Exp%>%
   group_by(Macro)%>%
-  summarise(sd = sd(average.of.all.interval.points, na.rm = TRUE))
+  summarise(sd = sd(FST, na.rm = TRUE))
 
 Exp$sd = Exp8_sd$sd[match(Exp$Macro, Exp8_sd$Macro)]
 my.labels <- paste(Exp$ramp.num, "\n (", Exp$sd, "%)")
 
+
+
 #graph with image
 
-img <- readPNG("..\\Tension_R\\img\\img.png")
+img <- readPNG("C:\\Users\\Arthur\\255E\\Neural_R\\img\\img.png")
 
 g <- rasterGrob(img, interpolate=TRUE, height = 1, width = 1) #chnage height and width of the image 
 
-  ggplot(Exp, aes(x= ramp.num, y= pvb.BL.tension, color = Trial)) +
+  ggplot(Exp, aes(x= ramp.num, y= pcb.FST, color = Trial)) +
     geom_point()+
   geom_line()+
-    annotation_custom(g, xmin=-Inf, xmax=Inf, ymin= max(Exp$pvb.BL.tension) , ymax=Inf)+
+    annotation_custom(g, xmin=-Inf, xmax=Inf, ymin= max(Exp$pcb.FST) , ymax=Inf)+
   geom_smooth(method ="lm", se=FALSE, color = "black", aes (group = 1))+ 
-  ggtitle("Baseline Tension")+
+  ggtitle("FST")+
   theme(plot.title = element_text(hjust=0.5)) +
     scale_x_continuous("Time(Min.)", breaks = round(seq(min(Exp$ramp.num), max(Exp$ramp.num), by=2),1))+
    theme(axis.text.x = element_text(angle = 45, hjust = 1))+
-  scale_y_continuous("Percent change from baseline", labels = scales::percent, breaks = round(seq(min(Exp$pvb.BL.tension), max(Exp$pvb.BL.tension), by = 0.1),1))+
+  scale_y_continuous("Percent change from baseline", labels = scales::percent, breaks = round(seq(min(Exp$pcb.FST), max(Exp$pcb.FST), by = 0.1),1))+
     expand_limits(y=1.7)
     
    
@@ -1136,22 +1608,22 @@ cat( w1, w2, w3, w4, w5, w6, w7, sep = "  ")
     
  #graph with image and standard deviation 
     
-    img <- readPNG("..\\Tension_R\\img\\img.png")
+    img <- readPNG("C:\\Users\\Arthur\\255E\\Neural_R\\img\\img.png")
 
 g <- rasterGrob(img, interpolate=TRUE, height = 1, width = 1) #chnage height and width of the image 
 
-  ggplot(Exp, aes(x= ramp.num, y= pvb.BL.tension, color = Trial)) +
+  ggplot(Exp, aes(x= ramp.num, y= pcb.FST, color = Trial)) +
     geom_point()+
   geom_line()+
-    annotation_custom(g, xmin=-Inf, xmax=Inf, ymin= max(Exp$pvb.BL.tension) , ymax=Inf)+
+    annotation_custom(g, xmin=-Inf, xmax=Inf, ymin= max(Exp$pcb.FST) , ymax=Inf)+
   geom_smooth(method ="lm", se=FALSE, color = "black", aes (group = 1))+ 
-  ggtitle("Baseline Tension")+
+  ggtitle("FST")+
   theme(plot.title = element_text(hjust=0.5)) +
     scale_x_continuous("Ramp Number", breaks = round(seq(min(Exp$ramp.num), max(Exp$ramp.num), by=2),1))+
    theme(axis.text.x = element_text(angle = 45, hjust = 1))+
-  scale_y_continuous("Percent varation from baseline", labels = scales::percent,  breaks = round(seq(min(Exp$pvb.BL.tension), max(Exp$pvb.BL.tension), by = 0.1),1))+
+  scale_y_continuous("Percent varation from baseline", labels = scales::percent,  breaks = round(seq(min(Exp$pcb.FST), max(Exp$pcb.FST), by = 0.1),1))+
     expand_limits(y=1.7)+
-   labs(caption = "Standard Deviation: 4.195153  3.882836  3.67814  3.351317  3.856701  2.792751  0.0548267") 
+   labs(caption = "Standard Deviation: 0.7652525  0.8857445  1.98097  1.286898  2.318214") 
    
   
   #annotate("text", x = seq(from = 6, to = max(x-axis), by = 6), y = , label = mysds)
@@ -1180,38 +1652,75 @@ library(reshape)
 
 
 
-#reshape data baseline
+#reshape data resting discharge
 
 library(reshape)
-Exp_19 = cast(Exp, Trial~ramp.num, value = "BL.tension" )
-Exp_19$type = "BL.tension"
+Exp_19 = cast(Exp, Trial~ramp.num, value = "Resting.discharge" )
+Exp_19$type = "Resting.discharge"
 Exp_19$type.num = "4"
 
 
-#reshape data peak tension
-Exp_21 = cast(Exp, Trial~ramp.num, value = "peak.tension")
-Exp_21$type = "peak.tension"
+#reshape data DP
+Exp_21 = cast(Exp, Trial~ramp.num, value = "DP")
+Exp_21$type = "DP"
 Exp_21$type.num = "3"
 
-#reshape data SR tension
-Exp_22 = cast(Exp, Trial~ramp.num, value = "average.of.all.interval.points")
-Exp_22$type = "average.of.all.interval.points"
+#reshape data IST
+Exp_22 = cast(Exp, Trial~ramp.num, value = "IST")
+Exp_22$type = "IST"
 Exp_22$type.num = "2"
 
-#reshape data min tension 
+#reshape data FST
 
-Exp_23 = cast(Exp, Trial~ramp.num, value = "Min.value")
-Exp_23$type = "Min.value"
+Exp_23 = cast(Exp, Trial~ramp.num, value = "FST")
+Exp_23$type = "FST"
 Exp_23$type.num = "1"
 
-Exp_24 = bind_rows(list(Exp_19, Exp_21, Exp_22, Exp_23))
+Exp_24 = cast(Exp, Trial~ramp.num, value = "DI")
+Exp_24$type = "DI"
+Exp_24$type.num = "5"
+
+Exp_25 = cast(Exp, Trial~ramp.num, value = "X50hz.frequency")
+Exp_25$type = "X50hz.frequency"
+Exp_25$type.num = "6"
+
+Exp_26 = cast(Exp, Trial~ramp.num, value = "X100hz.frequency")
+Exp_26$type = "X100hz.frequency"
+Exp_26$type.num = "7"
+
+Exp_28 = bind_rows(list(Exp_19, Exp_21, Exp_22, Exp_23, Exp_24, Exp_25, Exp_26))
 
 library(dplyr)
 
-Exp_25 = Exp_24%>%
+Exp_29 = Exp_28%>%
   arrange(Trial)
 
 
+#attempt to get data to work with forloop
+
+
+Exp_31 = data.frame(Exp_29$type)
+Exp_31$type = Exp_31$Exp_29.type
+Exp_31$Exp_29.type = NULL
+Exp_31$type.num = Exp_29$type.num
+Exp_29$type = NULL
+Exp_29$type.num = NULL
+
+Exp_29$'31' = NA
+Exp_29$'32' = NA
+Exp_29$'33' = NA
+Exp_29$'34' = NA
+Exp_29$'35' = NA
+Exp_29$'36' = NA
+Exp_29$'37' = NA
+Exp_29$'38' = NA
+Exp_29$'39' = NA
+Exp_29$'40' = NA
+Exp_29$'41' = NA
+Exp_29$'42' = NA
+
+Exp_29$type = Exp_31$type
+Exp_29$type.num = Exp_31$type.num
 
 
 # Reorganizing data frame 
@@ -1225,36 +1734,35 @@ Exp_25 = Exp_24%>%
 
 #for loop to organize data
 
-for(i in 1:nrow(Exp_25)){
+for(i in 1:nrow(Exp_29)){
   cols  = c(2,8,14,20,26,32,38)
    for(j in 1:length(cols)){
      #print(cols[j])
      if (j == 1 & i == 1){
-      temp = Exp_25[i,cols[j]:(cols[j]+5)]
-      temp$Trial = Exp_25[i,"Trial"]
-      temp$type = Exp_25[i,"type"]
+      temp = Exp_29[i,cols[j]:(cols[j]+5)]
+      temp$Trial = Exp_29[i,"Trial"]
+      temp$type = Exp_29[i,"type"]
      } else {
-      temp2 = Exp_25[i,cols[j]:(cols[j]+5)]
-      temp2$Trial = Exp_25[i,"Trial"]
-      temp2$type = Exp_25[i,"type"]
+      temp2 = Exp_29[i,cols[j]:(cols[j]+5)]
+      temp2$Trial = Exp_29[i,"Trial"]
+      temp2$type = Exp_29[i,"type"]
       colnames(temp2)[1:6] = as.character(1:6)
       temp = rbind(temp,temp2)
      }
   }
 }
-Exp_26 = temp
+Exp_30 = temp
  
 
-#adding a column to Exp_26 that calculates the average calue for each row of numeric variables
+#adding a column to Exp_30 that calculates the average calue for each row of numeric variables
 
 
-Exp_26$Average = apply(Exp_26[1:6], 1 , mean)
-
+Exp_30$Average = apply(Exp_30[1:6], 1 , mean)
 
 
 #write dataframe to excel sheet
 
-write.xlsx(Exp_26, file = "C:\\Users\\Arthur\\255E\\Tension_R\\Exp_output\\Exp_out.xlsx", sheetName="Sheet1")
+write.xlsx(Exp_30, file = "C:\\Users\\Arthur\\255E\\Neural_R\\Exp_output\\Exp_out.xlsx", sheetName="Sheet1")
 
 
 
