@@ -14,7 +14,7 @@ Experiments are conducted as a repeated measure design. Treatment and control ex
 
 At the time this code was written the python code to gather time points was under development. Once the python code is finished it will gather the data for resting discharge, DP, IST, FST, DI, 50 hz vibrations, 100 hz vibrations. 
 
-The python out-put is .csv and the file name was saved as analyzed year, month, date, muscle number, and trial letter (ie. 170109-1a). Under the file directory in a folder entitled Neural_R, four folders exist experiment, control, img, and experiment output. Python.csv files are to be placed under either experiment and control based on the type of trial, the image for the graph (point 6 below) placed in folder img entitled img (png file), and excel output will receive the excel output from the r code that organizes relevant data values grouped for each trial on one sheet. The features of this r code are listed below.  
+The python out-put is .csv and the file name was saved as analyzed year, month, date, muscle number, and trial letter (ie. 170109-1a). Under the file directory in a folder entitled Neural_R, four folders exist experiment, control, img, plot_output and experiment output. Python.csv files are to be placed under either experiment and control based on the type of trial, the image for the graph (point 6 below) placed in folder img entitled img (png file), and excel output will receive the excel output from the r code that organizes relevant data values grouped for each trial on one sheet. The features of this r code are listed below.  
 
 The idea of this code was to consider all of the possible types of graphs that we would need to generate for this lab. If you are only interested in some of the graphs you can press the play icon in the chunk, copy the section of code to a new r mark down file, or find the plot you want write x1 = before the plot code then copy: 
 
@@ -30,16 +30,17 @@ this will save the plot as a .png file in the same directory as the Experiment a
 
 3. Produces combination line plots for Resting discharge, DP, IST, FST, DI, 50 hz vibrations, 100 hz vibrations that shows the percent change from baseline (first 20 minutes of experiment) over time of the experiment and contains a legend for the date of each trial. Each graph is produced independently as well as grouped multi-plots of treatment and control. 
 
-
-
-
-
-
-
-
-4. Produces a line plot of averages compared to time of experiment for multiple trials for average tension 3.25-3.75 of 4 sec. static stretch with error bars. This code will produce a graph of averages for treatment and control, a single plot of averages with two lines with error bars for treatment and control, and both individual graphs of average treatment and control faceted together.  
+4. Produces a line plot of averages compared to time of experiment for multiple trials for average SR 3.25-3.75 of 4 sec. static stretch with error bars. This code will produce a graph of averages for treatment and control, a single plot of averages with two lines with error bars for treatment and control, and both individual graphs of average treatment and control faceted together.  
 
 5. Produces graphs of dot plots with error bars of the average SR (3.25-3.75 of static stretch) per 20 minutes of the experiment for every trial. Graphs are produced independently for treatment and control, a multiplot that shows treatment and control, and a single graph that shows treatment and control.    
+
+
+6. Produces graphs of dotplots with error bars of 50 Hz vibrations, 100 Hz vibrations for experiment and control for every trial. Graphs are produced independently for treatment and control, a multiplot that shows treatment and control, and a single graph that shows treatment and control.  
+
+
+
+
+
 
 6. Produces a line plot of peak tension as a percent variation from baseline tension over time of experiment. This graph also includes a picture of the afferent firing caused by the first static stretch. The caption of this graph lists the standard deviation values for each 20-minute period of the experiment. 
 
@@ -1288,7 +1289,7 @@ ggplot(Exp_Con11, aes(x=Exp_Con11$type, y=avg.all.macro, group = num.type, color
 ```
 # dot plot for percent change from baseline for vibrations 50 hz and 100hz compared to control
 
-```{r dotPlotvibrations}
+```{r dotPlotvibrations, fig.width=9, fig.height= 7}
 
 #Experimental group 50 hz subsetting and calculation of mean, standard deviation, and standard error. 
 
@@ -1339,26 +1340,26 @@ Exp_14$max1 = mean(Exp_14$ymax)
 #Control group 50 hz subsetting and calculations of mean, standard deviation, and standard error
 
  
- Con_19 = Control %>%
+ con_19 = Control %>%
   group_by(Macro)%>%
   summarise(avg = mean(pcb.50hz, na.rm = TRUE))
 
  Con_20 = Control%>%
   group_by(Macro)%>%
-  summarise(sd = sd(pcb.50hz, na.rm = TRUE))
+  summarise(SD = sd(pcb.50hz, na.rm = TRUE))
 
 Con_21 = as.data.frame(table(Control$Macro))
-Con_19$SD = Con_20$SD
-Con_19$n = as.numeric(Con_21$Freq)
-Con_19$sqrt = sqrt(Con_19$n)
-Con_19$SE = Con_19$SD / Con_19$sqrt
-Con_19$ymin = Con_19$avg - Con_19$SE
-Con_19$ymax = Con_19$avg + Con_19$SE
-Con_19$type = "50 Hz Control"
+con_19$SD = Con_20$SD
+con_19$n = as.numeric(Con_21$Freq)
+con_19$sqrt = sqrt(con_19$n)
+con_19$SE = con_19$SD / con_19$sqrt
+con_19$ymin = con_19$avg - con_19$SE
+con_19$ymax = con_19$avg + con_19$SE
+con_19$type = "50 Hz Control"
  
-Exp_19$num.type = 1.2
-Exp_19$min1 = mean(Exp_19$ymin)
-Exp_19$max1 = mean(Exp_19$ymax)
+con_19$num.type = 1.2
+con_19$min1 = mean(con_19$ymin)
+con_19$max1 = mean(con_19$ymax)
  
 #Control group 100 Hz subsetting and calculations of mean, standard deviation, and standard error 
 
@@ -1369,23 +1370,26 @@ Exp_19$max1 = mean(Exp_19$ymax)
 
  Con_23 = Control%>%
   group_by(Macro)%>%
-  summarise(sd = sd(pcb.100hz, na.rm = TRUE))
+  summarise(SD = sd(pcb.100hz, na.rm = TRUE))
 
 Con_24 = as.data.frame(table(Control$Macro))
  Con_22$SD = Con_23$SD
  Con_22$n = as.numeric(Con_24$Freq)
  Con_22$sqrt = sqrt(Con_22$n)
- Con_22$SE = Con_20$SD / Con_20$sqrt
+ Con_22$SE = Con_22$SD / Con_22$sqrt
  Con_22$ymin = Con_22$avg - Con_22$SE
  Con_22$ymax = Con_22$avg + Con_22$SE
  Con_22$type = "50 Hz Control"
 
- Exp_22$num.type = 1.3
-Exp_22$min1 = mean(Exp_22$ymin)
-Exp_22$max1 = mean(Exp_22$ymax)
+ Con_22$num.type = 1.3
+Con_22$min1 = mean(Con_22$ymin)
+Con_22$max1 = mean(Con_22$ymax)
 
 #binds data frame to compare treatment and control in plot
-     Exp_Con12 = rbind(Exp_17,Exp_14, Con_19, Con_22)
+    
+Exp_Con13 = rbind(Exp_14, Exp_17)
+Exp_Con14 = rbind(Con_22, con_19)
+Exp_Con12 = rbind(Exp_17, Exp_14, Con_22, con_19)
  
 
      
@@ -1394,7 +1398,7 @@ library(ggplot2)
      
 #plot of percent chnage from baseline for Experiment 50 hz scatter plot with errorbars Experiment 
 
-   ggplot(Exp_17,aes(x=num.type, y=pcb.50hz, group = type, color = Macro)) + 
+   ggplot(Exp_17,aes(x=num.type, y=avg, group = type, color = Macro)) + 
    geom_errorbar(aes(ymin=min1 , ymax=max1), width= 20) +
    geom_point()+
      geom_jitter()+
@@ -1406,55 +1410,106 @@ library(ggplot2)
         
    
    
-#plot of average for macro Bl.Tension per macro scatterplot with errorbars Control    
+#plot of percent chnage from baseline for Experiment 100 hz scatter plot with errorbars Experiment   
 
 
-   ggplot(Exp_14,aes(x=num.type, y=avg.all.macro, group = type, color = Macro)) + 
+   ggplot(Exp_14,aes(x=num.type, y=avg, group = type, color = Macro)) + 
    geom_errorbar(aes(ymin=min1 , ymax=max1), width= 20) +
    geom_point()+
      geom_jitter()+
-     ggtitle("Average SR for Control Group\n")+
+     ggtitle("100 Hz vibrations\n")+
   theme(plot.title = element_text(hjust=0.5))+
-  labs(x="Type\n", y = "Average SR\n")+
+  labs(x="Type\n", y = "Percent Change from Baseline\n")+
         theme(axis.text.x=element_blank(),
         axis.ticks.x=element_blank())
    
+#plot of percent chnage from baseline for Experiment 50 hz scatter plot with errorbars control   
+
+
+   ggplot(con_19,aes(x=num.type, y=avg, group = type, color = Macro)) + 
+   geom_errorbar(aes(ymin=min1 , ymax=max1), width= 20) +
+   geom_point()+
+     geom_jitter()+
+     ggtitle("50Hz Control Group\n")+
+  theme(plot.title = element_text(hjust=0.5))+
+  labs(x="Type\n", y = "Percent Change from Baseline\n")+
+        theme(axis.text.x=element_blank(),
+        axis.ticks.x=element_blank())
+   
+#plot of percent chnage from baseline for Experiment 100 hz scatter plot with errorbars control 
+
+
+   ggplot(Con_22,aes(x=num.type, y=avg, group = type, color = Macro)) + 
+   geom_errorbar(aes(ymin=min1 , ymax=max1), width= 20) +
+   geom_point()+
+     geom_jitter()+
+     ggtitle("100 Hz Control Group\n")+
+  theme(plot.title = element_text(hjust=0.5))+
+  labs(x="Type\n", y = "Percent Change from Baseline\n")+
+        theme(axis.text.x=element_blank(),
+        axis.ticks.x=element_blank())
 
    
+   
+      
 
 # plot comparing treatment and control scatter plots with errorbars. 
 
       #for multiplot
-   b3=(ggplot(Con8,aes(x=num.type, y=avg.all.macro, group = type, color = Macro)) + 
+   b3=   ggplot(Exp_17,aes(x=num.type, y=avg, group = type, color = Macro)) + 
    geom_errorbar(aes(ymin=min1 , ymax=max1), width= 20) +
    geom_point()+
      geom_jitter()+
-     ggtitle("Average SR for Control Group\n")+
+     ggtitle("50 Hz Vibrations\n")+
   theme(plot.title = element_text(hjust=0.5))+
-  labs(x="Control\n", y = "Average SR\n"))+
+  labs(x="Drug\n", y = "Percent Change from Baseline\n")+
+         theme(axis.text.x=element_blank(),
+        axis.ticks.x=element_blank())
+   
+   
+  b4 = ggplot(Exp_14,aes(x=num.type, y=avg, group = type, color = Macro)) + 
+   geom_errorbar(aes(ymin=min1 , ymax=max1), width= 20) +
+   geom_point()+
+     geom_jitter()+
+     ggtitle("100 Hz vibrations\n")+
+  theme(plot.title = element_text(hjust=0.5))+
+  labs(x="Type\n", y = "Percent Change from Baseline\n")+
         theme(axis.text.x=element_blank(),
         axis.ticks.x=element_blank())
    
-   
-   
-      #for later multiplot
-  a3= (ggplot(Exp8,aes(x=num.type, y=avg.all.macro, group = type, color = Macro)) + 
+  b5 = ggplot(con_19,aes(x=num.type, y=avg, group = type, color = Macro)) + 
    geom_errorbar(aes(ymin=min1 , ymax=max1), width= 20) +
    geom_point()+
      geom_jitter()+
-     ggtitle("Average SR versus Time for Treatment Group\n")+
+     ggtitle("50Hz Control Group\n")+
   theme(plot.title = element_text(hjust=0.5))+
-  labs(x="Drug\n", y = "Average SR\n"))+
-       theme(axis.text.x=element_blank(),
+  labs(x="Type\n", y = "Percent Change from Baseline\n")+
+        theme(axis.text.x=element_blank(),
         axis.ticks.x=element_blank())
    
-   multiplot(a3,b3)
+b6 =  
+   ggplot(Con_22,aes(x=num.type, y=avg, group = type, color = Macro)) + 
+   geom_errorbar(aes(ymin=min1 , ymax=max1), width= 20) +
+   geom_point()+
+     geom_jitter()+
+     ggtitle("100 Hz Control Group\n")+
+  theme(plot.title = element_text(hjust=0.5))+
+  labs(x="Type\n", y = "Percent Change from Baseline\n")+
+        theme(axis.text.x=element_blank(),
+        axis.ticks.x=element_blank())
+
    
+   
+
+  # multiplot(b3, b4, b5, b6, col = 2)
+   
+   
+
    #combining treatment and control using facet
    
-Exp_Con11 = rbind(Exp8,Con8)
 
-ggplot(Exp_Con11, aes(x=num.type, y=avg.all.macro, group = num.type, color = Macro))+
+
+ggplot(Exp_Con12, aes(x=num.type, y=avg, group = num.type, color = Macro))+
   #scale_colour_manual(values = c("steelblue", "darkblue"))+
   geom_point()+
   geom_errorbar(aes(ymin=min1, ymax= max1), size=0.5,   
@@ -1470,15 +1525,37 @@ ggplot(Exp_Con11, aes(x=num.type, y=avg.all.macro, group = num.type, color = Mac
 
 #side by side experiment and control scatter plot with wrror bars
 
-ggplot(Exp_Con11, aes(x=Exp_Con11$type, y=avg.all.macro, group = num.type, color =Macro))+
+ggplot(Exp_Con13, aes(x=Exp_Con13$type, y=avg, group = num.type, color =Macro))+
   geom_point()+
   geom_errorbar(aes(ymin=min1, ymax= max1), size=0.5,   
     width=.25,position=position_dodge(.9))+
   geom_jitter()+
-  ggtitle("Average SR for treatment and control")+
+  ggtitle("50hz and 100Hz vibrations")+
   theme(plot.title = element_text(hjust=0.5))+
-  labs(x="Experiment type\n", y = "Average of all Macros\n")
- 
+  labs(x="Experiment type\n")+
+  scale_y_continuous("Percent change from baseline\n",labels = scales::percent, breaks = round(seq(min(Exp_Con12$avg), max(Exp_Con12$avg), by = 0.6),1))
+
+z1 = ggplot(Exp_Con13, aes(x=Exp_Con13$type, y=avg, group = num.type, color =Macro))+
+  geom_point()+
+  geom_errorbar(aes(ymin=min1, ymax= max1), size=0.5,   
+    width=.25,position=position_dodge(.9))+
+  geom_jitter()+
+  ggtitle("50hz and 100Hz vibrations")+
+  theme(plot.title = element_text(hjust=0.5))+
+  labs(x="Experiment type\n")+
+  scale_y_continuous("Percent change from baseline\n",labels = scales::percent, breaks = round(seq(min(Exp_Con12$avg), max(Exp_Con12$avg), by = 0.6),1))
+
+z2 = ggplot(Exp_Con14, aes(x=Exp_Con14$type, y=avg, group = num.type, color =Macro))+
+  geom_point()+
+  geom_errorbar(aes(ymin=min1, ymax= max1), size=0.5,   
+    width=.25,position=position_dodge(.9))+
+  geom_jitter()+
+  ggtitle("50hz and 100Hz vibrations Control")+
+  theme(plot.title = element_text(hjust=0.5))+
+  labs(x="Experiment type\n")+
+  scale_y_continuous("Percent change from baseline\n",labels = scales::percent, breaks = round(seq(min(Exp_Con12$avg), max(Exp_Con12$avg), by = 0.6),1))
+
+ multiplot(z1, z2)
 
 ```
 
