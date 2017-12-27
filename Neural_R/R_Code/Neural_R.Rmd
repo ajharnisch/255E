@@ -107,9 +107,6 @@ A folder named Neural_R was created so that multiple .csv files could be placed 
 
 #multiple data import for experiment by use of for loop to find .csv files and rbind to single data frame for Experiment. 
 
-
-
-
 #myfiles is a new data frame for all .csv files from Experiment folder 
 myfiles=dir(path = "C:/Users/Arthur/255E/Neural_R/Experiment", pattern = "*.csv$", all.files = TRUE, full.names = TRUE)
 
@@ -578,7 +575,8 @@ ggplot(Exp, aes(x= ramp.num, y= pcb.100hz, color = Trial)) +
   theme(plot.title = element_text(hjust=0.5)) +
   scale_x_continuous("Vibration number", breaks = round(seq(min(Exp$ramp.num), max(Exp$ramp.num), by=2),1))+
   theme(axis.text.x = element_text(angle = 45, hjust = 1))+
-  scale_y_continuous("Percent change from baseline",labels = scales::percent, breaks = round(seq(min(Exp$pcb.100hz), max(Exp$pcb.100hz), by = 0.5),1)) 
+  scale_y_continuous("Percent change from baseline",labels = scales::percent, breaks = round(seq(min(Exp$pcb.100hz), max(Exp$pcb.100hz), by = 0.5),1))
+  
 
 ```
 
@@ -1534,6 +1532,7 @@ ggplot(Exp_Con13, aes(x=Exp_Con13$type, y=avg, group = num.type, color =Macro))+
   theme(plot.title = element_text(hjust=0.5))+
   labs(x="Experiment type\n")+
   scale_y_continuous("Percent change from baseline\n",labels = scales::percent, breaks = round(seq(min(Exp_Con12$avg), max(Exp_Con12$avg), by = 0.6),1))
+  
 
 z1 = ggplot(Exp_Con13, aes(x=Exp_Con13$type, y=avg, group = num.type, color =Macro))+
   geom_point()+
