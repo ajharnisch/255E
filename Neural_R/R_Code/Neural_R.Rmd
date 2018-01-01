@@ -1022,6 +1022,8 @@ Exp10 = as.data.frame(table(Exp$Macro))
  
  Exp8$type = "Drug"
  
+ 
+
 #control subset and calculation of mean, standard deviation, and standard error.  
  
  Con8 = Control %>%
