@@ -573,7 +573,9 @@ a1 = ggplot(Exp, aes(x= ramp.num, y= pvb.BL.tension, color = Trial)) +
   scale_x_continuous("Ramp", breaks = round(seq(min(Exp$ramp.num), max(Exp$ramp.num), by=2),1))+
   theme(axis.text.x = element_text(angle = 45, hjust = 1))+
   scale_y_continuous("Percent change from baseline",labels = scales::percent,  breaks = round(seq(min(Exp$pvb.BL.tension), max(Exp$pvb.BL.tension), by = 0.1),1))+
-  theme(legend.position = "none")
+  theme(legend.position = "none")+
+annotate("text", x=9, y=.6, label = "25uM NE")+
+  annotate("text", x=31, y=.8, label = "10uM NE")
 
 
 #plot of peak tension
@@ -586,7 +588,9 @@ b1 = ggplot(Exp, aes(x = ramp.num, y=pvb.peak.tension, color = Trial)) +
 theme(plot.title = element_text(hjust=0.5))+
   scale_x_continuous("Ramp", breaks = round(seq(min(Exp$ramp.num), max(Exp$ramp.num), by=2),1))+
   theme(axis.text.x = element_text(angle = 45, hjust = 1))+
-  scale_y_continuous("Percent change from baseline", labels = scales::percent, breaks = round(seq(min(Exp$pvb.peak.tension), max(Exp$pvb.peak.tension), by = 1.2),1))+theme(legend.position = "none")
+  scale_y_continuous("Percent change from baseline", labels = scales::percent, breaks = round(seq(min(Exp$pvb.peak.tension), max(Exp$pvb.peak.tension), by = 0.1),1))+theme(legend.position = "none")+
+annotate("text", x=9, y=.6, label = "25uM NE")+
+  annotate("text", x=31, y=.8, label = "10uM NE")
 
 
 
@@ -596,11 +600,13 @@ c1 = ggplot(Exp, aes(x=ramp.num, y=pvb.SR, color= Trial))+
     geom_point()+
   geom_line()+
   geom_smooth(method ="lm", se=FALSE, color = "black", aes (group = 1))+
-  ggtitle("SR") +
+  ggtitle("SR Tension") +
   theme(plot.title = element_text(hjust=0.5))+
   scale_x_continuous("Ramp",breaks = round(seq(min(Exp$ramp.num), max(Exp$ramp.num), by=2),1))+
   theme(axis.text.x = element_text(angle = 45, hjust = 1))+
-  scale_y_continuous("Percent change from baseline", labels = scales::percent, breaks = round(seq(min(Exp$pvb.SR), max(Exp$pvb.SR), by = 0.8),1))+theme(legend.position = "none")
+  scale_y_continuous("Percent change from baseline", labels = scales::percent, breaks = round(seq(min(Exp$pvb.SR), max(Exp$pvb.SR), by = 0.1),1))+theme(legend.position = "none")+
+annotate("text", x=9, y=.6, label = "25uM NE")+
+  annotate("text", x=31, y=.8, label = "10uM NE")
 
 
 #plot of min tension
@@ -609,11 +615,13 @@ d1 = ggplot(Exp, aes(x=ramp.num, y=pvb.min, color = Trial))+
     geom_point()+
   geom_line()+
   geom_smooth(method ="lm", se=FALSE, color = "black", aes (group = 1)) +
-  ggtitle("Minimum")+
+  ggtitle("Minimum Tension")+
   theme(plot.title = element_text(hjust=0.5))+
    scale_x_continuous("Ramp", breaks = round(seq(min(Exp$ramp.num), max(Exp$ramp.num), by=2),1))+
   theme(axis.text.x = element_text(angle = 45, hjust = 1))+
-  scale_y_continuous("Percent change from baseline",labels = scales::percent, breaks = round(seq(min(Exp$pvb.min), max(Exp$pvb.min), by = 2),1))
+  scale_y_continuous("Percent change from baseline",labels = scales::percent, breaks = round(seq(min(Exp$pvb.min), max(Exp$pvb.min), by = 0.1),1))+
+annotate("text", x=9, y=.6, label = "25uM NE")+
+  annotate("text", x=31, y=.8, label = "10uM NE")
 
 
   

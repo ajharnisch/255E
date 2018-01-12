@@ -1,0 +1,353 @@
+---
+title: "Adrenergic Response"
+author: "Arthur Harnisch"
+date: "January 9, 2018"
+output: word_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE)
+```
+Listed below are two tables one with trials included in this report and the second table lists the trials that were excluded. 
+
+```{r FilesTable, fig.width = 12, fig.height = 7, warning=FALSE}
+# import dataframe
+
+Inc = read.csv("D:\\Desktop\\data analysis\\Andrenergic\\Adrenergic_Include_exclude.csv", header = TRUE)
+
+
+#grouping for Included files
+
+Inc1 = data.frame(Inc$Included)
+Inc2 = data.frame(Inc$Inc.Note)
+Inc3 = cbind(Inc1, Inc2)
+Inc3$Trial.Included = Inc3$Inc.Included
+Inc3$Inc.Included = NULL
+Inc3$Details = Inc3$Inc.Inc.Note
+Inc3$Inc.Inc.Note = NULL
+Inc4 = Inc3[!(Inc3$Trial == ""),]
+
+
+#grouping for Excluded
+
+Inc5 = data.frame(Inc$Excluded)
+Inc6 = cbind(Inc5, Inc2)
+Inc7 = Inc6[!(Inc6$Inc.Excluded ==""),]
+Inc7$Trial.Excluded = Inc7$Inc.Excluded
+Inc7$Inc.Excluded = NULL
+Inc7$Details = Inc7$Inc.Inc.Note
+Inc7$Inc.Inc.Note = NULL
+
+#making tables
+
+#install.packages("gridExtra")
+library(gridExtra)
+library(grid)
+
+
+ tt = ttheme_default()
+# t <- textGrob("text")
+
+
+ # gs <- lapply(1:9, function(ii)
+ #   grobTree(rectGrob(gp=gpar(fill=ii, alpha=0.5)), textGrob(ii)))
+ # grid.arrange(grobs=gs, ncol=4,
+ #                top="top label", bottom="bottom\nlabel",
+ #               left="left label", right="right label")
+ # grid.rect(gp=gpar(fill=NA))
+
+grid.arrange(tableGrob(Inc4[1:length(Inc4$Trial), 1:2], theme = tt), tableGrob(Inc7[1:length(Inc7$Trial), 1:2], theme = tt), nrow = 1, top = "Table of Adrenergic Response Trials", bottom=".\n.",
+                left=".", right=".")
+
+
+
+# grid.table(Inc4, theme = tt)
+# grid.table(Inc7, theme = tt)
+
+
+```
+
+All Norepinephrine trials compared to: alpha-1 adrenergic agonist (Phenylephrine), alpha-2 adrenoreceptor antagonist (yohimbine), alpha 1 adrenoceptor antagonist (Prozosin). 
+
+```{r NEdoseResponse, fig.width = 10, fig.height = 7, warning=FALSE, echo= FALSE, comment=NA}
+
+#NE dose response
+#data import
+
+#multiple data import for experiment by use of for loop to find .csv files and rbind to single data frame for Experiment. 
+
+#myfiles is a new data frame for all .csv files from Experiment folder 
+myfiles=dir(path = "D:\\Desktop\\data analysis\\Andrenergic\\NE\\NE_Dose_Response_Neural\\Experiment", pattern = "*.csv$", all.files = TRUE, full.names = TRUE)
+
+
+#for loop loops over myfiles
+
+for(i in 1: length(myfiles) ){
+  
+  #open each file
+   read.csv(myfiles[i])
+  temp = read.csv(myfiles[i])
+  fname = basename(myfiles[i])
+  
+  #locates the year month day, muscle number, and trial number 
+  
+  loc = regexpr(pattern = "[[:digit:]]+[-_][[:digit:]][[:alpha:]]", text = fname)
+  trial = substr(fname, start = loc[[1]], stop = loc[[1]] + (attr(loc,'match.length')-1))
+  trial = sub(pattern = '_','-', x= trial)
+  
+  temp2 = temp[-(which(temp$Ramp.. == '')),]
+  
+  
+  macroRows = which(temp2$Ramp.. == 'for macro #:')
+  
+  temp2$Macro = NA
+  
+  for (j in 1:length(macroRows)){
+    macroNum = temp2$Resting.discharge[macroRows[j]]
+    if (j < length(macroRows)){
+      temp2$Macro[(macroRows[j]+1) : (macroRows[j+1]-1) ] = macroNum
+    } else if (j == length(macroRows)){
+      temp2$Macro[(macroRows[j]+1) : nrow(temp2) ] = macroNum
+    }
+  }
+  
+  temp2 = temp2[-(macroRows), ]
+  temp2 = droplevels(temp2)
+  temp2$Ramp.. = as.numeric(as.character(temp2$Ramp..))
+  temp2$Ramp..[temp2$Ramp.. == 0] = 6
+  
+  temp2$Trial = trial
+
+
+  
+  if ( i == 1){
+    Exp = temp2
+  } else {
+    Exp = rbind( Exp, temp2)
+  }
+}
+
+
+
+#data manipulation
+
+#calculates the percept change from baseline for each of the trials and makes a seperate column to display the percent from variation 10 sec. before static stretch (baseline tension), peak tension, average tension 3.25-3.75 of 4 sec. static stretch, and minimum tension. 
+
+
+
+#data manipulations are for Experiment group
+
+
+# finding the percent change from baseline (first 6 time points of file) of Resting.discharge 
+
+ 
+
+library(dplyr)
+Exp1 = tbl_df(Exp)
+
+#res = filter(Exp1, Macro == 1, Ramp.. <7)   #dplyr filter 
+
+ res1 = Exp1[Exp1$Macro == 1 & Exp1$Ramp.. < 7,] #base r filter 
+
+res2 = res1 %>%
+  group_by(Trial)%>%
+  summarise(avg_reseting.discharge = mean(Resting.discharge, na.rm = TRUE))
+
+
+  Exp$avg_reseting.discharge = res2$avg_reseting.discharge[match(Exp$Trial, res2$Trial)]
+
+
+Exp$pcb.resting.discharge = Exp$Resting.discharge / Exp$avg_reseting.discharge
+
+
+#finding the percent variation from baseline in DP
+
+res3 = res1 %>%
+  group_by(Trial)%>%
+  summarise(avg_DP = mean(DP, na.rm = TRUE))
+
+
+ Exp$avg_DP = res3$avg_DP[match(Exp$Trial, res3$Trial)]
+ 
+ Exp$pcb.DP = Exp$DP / Exp$avg_DP
+ 
+ #finding the percent change form baseline in IST
+ 
+ 
+ res4 = res1 %>%
+  group_by(Trial)%>%
+  summarise(avg_IST = mean(IST, na.rm = TRUE))
+
+
+ Exp$avg_IST = res4$avg_IST[match(Exp$Trial, res4$Trial)]
+ 
+ Exp$pcb.IST = Exp$IST / Exp$avg_IST
+
+ 
+  #finding the percent variation form baseline in FST
+ 
+ 
+ res5 = res1 %>%
+  group_by(Trial)%>%
+  summarise(avg_FST = mean(FST, na.rm = TRUE))
+
+
+ Exp$avg_FST = res5$avg_FST[match(Exp$Trial, res5$Trial)]
+ 
+ Exp$pcb.FST = Exp$FST / Exp$avg_FST
+ 
+ 
+ # finding the percent variation from baseline in DI
+
+ 
+  
+ res6 = res1 %>%
+  group_by(Trial)%>%
+  summarise(avg_DI = mean(DI, na.rm = TRUE))
+
+
+ Exp$avg_DI = res6$avg_DI[match(Exp$Trial, res6$Trial)]
+ 
+ Exp$pcb.DI = Exp$DI / Exp$avg_DI
+ 
+  
+ # finding the percent change from baseline in 50Hz vibrations
+
+ 
+  
+ res7 = res1 %>%
+  group_by(Trial)%>%
+  summarise(avg_50hz = mean(X50hz.frequency, na.rm = TRUE))
+
+
+ Exp$avg_50hz = res7$avg_50hz[match(Exp$Trial, res7$Trial)]
+ 
+ Exp$pcb.50hz = Exp$X50hz.frequency / Exp$avg_50hz
+ 
+ 
+  
+ # finding the percent change from baseline in 100 Hz vibrations
+
+ 
+  
+ res8 = res1 %>%
+  group_by(Trial)%>%
+  summarise(avg_100hz = mean(X100hz.frequency, na.rm = TRUE))
+
+
+ Exp$avg_100hz = res8$avg_100hz[match(Exp$Trial, res8$Trial)]
+ 
+ Exp$pcb.100hz = Exp$X100hz.frequency / Exp$avg_100hz
+ 
+ 
+ #creating numeric x-axis for plotting that will label the ramp number in the file for each file. 
+ 
+ library(splitstackshape)
+ 
+ Exp5 = getanID(data = Exp, id.vars = "Trial")
+ 
+Exp$ramp.num = Exp5$.id
+
+
+
+library(ggplot2)
+
+
+#resting discharge
+
+a1 = ggplot(Exp, aes(x= ramp.num, y= pcb.resting.discharge, color = Trial)) +
+    geom_point()+
+  geom_line()+
+  geom_smooth(method ="lm", se=FALSE, color = "black", aes (group = 1))+ 
+  ggtitle("Resting Discharge")+
+  theme(plot.title = element_text(hjust=0.5)) +
+  scale_x_continuous("Ramp number", breaks = round(seq(min(Exp$ramp.num), max(Exp$ramp.num), by=2),1))+
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))+
+  scale_y_continuous("Percent change from baseline",labels = scales::percent, breaks = round(seq(min(Exp$pcb.resting.discharge), max(Exp$pcb.resting.discharge), by = 0.5),1))+
+  theme(legend.position = "none")+
+annotate("text", x=9, y=1.5, label = "25uM NE")+
+  annotate("text", x=31, y=.8, label = "10uM NE")
+
+#plot of DP
+
+b1 = ggplot(Exp, aes(x = ramp.num, y=pcb.DP, color = Trial)) +
+    geom_point()+
+  geom_line()+
+  geom_smooth(method ="lm", se=FALSE, color = "black", aes (group = 1))+
+  ggtitle("Dynamic Peak")+
+theme(plot.title = element_text(hjust=0.5))+
+  scale_x_continuous("Ramp number", breaks = round(seq(min(Exp$ramp.num), max(Exp$ramp.num), by=2),1))+
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))+
+  scale_y_continuous("Percent change from baseline", labels = scales::percent, breaks = round(seq(min(Exp$pcb.DP), max(Exp$pcb.DP), by = 0.8),1))+
+  theme(legend.position = "none")+
+annotate("text", x=9, y=1.2, label = "25uM NE")+
+  annotate("text", x=31, y=.8, label = "10uM NE")
+
+
+
+#plot of IST
+
+c1 = ggplot(Exp, aes(x=ramp.num, y=pcb.IST, color= Trial))+
+    geom_point()+
+  geom_line()+
+  geom_smooth(method ="lm", se=FALSE, color = "black", aes (group = 1))+
+  ggtitle("IST") +
+  theme(plot.title = element_text(hjust=0.5))+
+  scale_x_continuous("Ramp number",breaks = round(seq(min(Exp$ramp.num), max(Exp$ramp.num), by=2),1))+
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))+
+  scale_y_continuous("Percent change from baseline", labels = scales::percent, breaks = round(seq(min(Exp$pcb.IST), max(Exp$pcb.IST), by = 0.1),1))+
+  theme(legend.position = "none")+
+annotate("text", x=9, y=1.1, label = "25uM NE")+
+  annotate("text", x=31, y=.8, label = "10uM NE")
+
+
+#plot of FST
+
+d1 = ggplot(Exp, aes(x=ramp.num, y=pcb.FST, color = Trial))+
+    geom_point()+
+  geom_line()+
+  geom_smooth(method ="lm", se=FALSE, color = "black", aes (group = 1)) +
+  ggtitle("FST")+
+  theme(plot.title = element_text(hjust=0.5))+
+   scale_x_continuous("Ramp number", breaks = round(seq(min(Exp$ramp.num), max(Exp$ramp.num), by=2),1))+
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))+
+  scale_y_continuous("Percent change from baseline",labels = scales::percent, breaks = round(seq(min(Exp$pcb.FST), max(Exp$pcb.FST), by = 0.1),1))+
+annotate("text", x=9, y=1.5, label = "25uM NE")+
+  annotate("text", x=31, y=.8, label = "10uM NE")+
+theme(legend.position = "none")
+
+
+#plot of DI
+e1 = ggplot(Exp, aes(x= ramp.num, y= pcb.DI, color = Trial)) +
+    geom_point()+
+  geom_line()+
+  geom_smooth(method ="lm", se=FALSE, color = "black", aes (group = 1))+ 
+  ggtitle("DI")+
+  theme(plot.title = element_text(hjust=0.5)) +
+  scale_x_continuous("Ramp number", breaks = round(seq(min(Exp$ramp.num), max(Exp$ramp.num), by=2),1))+
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))+
+  scale_y_continuous("Percent change from baseline",labels = scales::percent, breaks = round(seq(min(Exp$pcb.DI), max(Exp$pcb.DI), by = 0.8),1))+
+  #theme(legend.position = "none")+
+annotate("text", x=9, y=1.5, label = "25uM NE")+
+  annotate("text", x=31, y=.8, label = "10uM NE")
+ 
+
+
+#install.packages("gridExtra")
+
+library(gridExtra)
+library(grid)
+library(ggplot2)
+
+tt = ttheme_default()
+#t <- textGrob("text")
+
+grid.arrange(a1,b1, c1,d1,e1, ncol = 2,  top = textGrob("Adrenergic Trials\n", gp = gpar(fontsize = 15, font = 8)), bottom="bottom\nlabel", 
+             left="Percent Change from Baseline", right="right label")
+
+
+
+
+```
+
+

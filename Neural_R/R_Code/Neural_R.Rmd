@@ -692,7 +692,7 @@ ggplot(Control, aes(x= ramp.num, y= pcb.100hz, color = Trial)) +
 ### Multiple plot for multiple line plot
 
 Produces a multiplot for each combination line plot. Baseline tension, peak tension, average tension 3.25-3.75 of 4 sec. static stretch, and minimum tension) that shows the percent change from baseline (first 20 minutes of experiment) over time of the experiment and contains a legend for the date of each trial. 
-```{r combinationLineplot, fig.height = 7, fig.width= 9}
+```{r combinationLineplot, fig.height = 7, fig.width= 10}
 
 #combining the individual plots so they can be compared
 
@@ -763,7 +763,9 @@ a1 = ggplot(Exp, aes(x= ramp.num, y= pcb.resting.discharge, color = Trial)) +
   scale_x_continuous("Ramp number", breaks = round(seq(min(Exp$ramp.num), max(Exp$ramp.num), by=2),1))+
   theme(axis.text.x = element_text(angle = 45, hjust = 1))+
   scale_y_continuous("Percent change from baseline",labels = scales::percent, breaks = round(seq(min(Exp$pcb.resting.discharge), max(Exp$pcb.resting.discharge), by = 0.5),1))+
-  theme(legend.position = "none")
+  theme(legend.position = "none")+
+annotate("text", x=9, y=1.5, label = "25uM NE")+
+  annotate("text", x=31, y=.8, label = "10uM NE")
 
 #plot of DP
 
@@ -776,7 +778,9 @@ theme(plot.title = element_text(hjust=0.5))+
   scale_x_continuous("Ramp number", breaks = round(seq(min(Exp$ramp.num), max(Exp$ramp.num), by=2),1))+
   theme(axis.text.x = element_text(angle = 45, hjust = 1))+
   scale_y_continuous("Percent change from baseline", labels = scales::percent, breaks = round(seq(min(Exp$pcb.DP), max(Exp$pcb.DP), by = 0.1),1))+
-  theme(legend.position = "none")
+  theme(legend.position = "none")+
+annotate("text", x=9, y=1.2, label = "25uM NE")+
+  annotate("text", x=31, y=.8, label = "10uM NE")
 
 
 
@@ -791,7 +795,9 @@ c1 = ggplot(Exp, aes(x=ramp.num, y=pcb.IST, color= Trial))+
   scale_x_continuous("Ramp number",breaks = round(seq(min(Exp$ramp.num), max(Exp$ramp.num), by=2),1))+
   theme(axis.text.x = element_text(angle = 45, hjust = 1))+
   scale_y_continuous("Percent change from baseline", labels = scales::percent, breaks = round(seq(min(Exp$pcb.IST), max(Exp$pcb.IST), by = 0.1),1))+
-  theme(legend.position = "none")
+  theme(legend.position = "none")+
+annotate("text", x=9, y=1.1, label = "25uM NE")+
+  annotate("text", x=31, y=.8, label = "10uM NE")
 
 
 #plot of FST
@@ -805,7 +811,9 @@ d1 = ggplot(Exp, aes(x=ramp.num, y=pcb.FST, color = Trial))+
    scale_x_continuous("Ramp number", breaks = round(seq(min(Exp$ramp.num), max(Exp$ramp.num), by=2),1))+
   theme(axis.text.x = element_text(angle = 45, hjust = 1))+
   scale_y_continuous("Percent change from baseline",labels = scales::percent, breaks = round(seq(min(Exp$pcb.FST), max(Exp$pcb.FST), by = 0.1),1))+
-  theme(legend.position = "none")
+annotate("text", x=9, y=1.5, label = "25uM NE")+
+  annotate("text", x=31, y=.8, label = "10uM NE")+
+theme(legend.position = "none")
 
 
 #plot of DI
@@ -818,7 +826,10 @@ e1 = ggplot(Exp, aes(x= ramp.num, y= pcb.DI, color = Trial)) +
   scale_x_continuous("Ramp number", breaks = round(seq(min(Exp$ramp.num), max(Exp$ramp.num), by=2),1))+
   theme(axis.text.x = element_text(angle = 45, hjust = 1))+
   scale_y_continuous("Percent change from baseline",labels = scales::percent, breaks = round(seq(min(Exp$pcb.DI), max(Exp$pcb.DI), by = 0.4),1))+
-  theme(legend.position = "none")
+  #theme(legend.position = "none")+
+annotate("text", x=9, y=1.5, label = "25uM NE")+
+  annotate("text", x=31, y=.8, label = "10uM NE")
+ 
   
 
 
@@ -836,21 +847,21 @@ f1 = ggplot(Exp, aes(x= ramp.num, y= pcb.50hz, color = Trial)) +
 
 
 #plot of 100hz vibrations
-g1 = ggplot(Exp, aes(x= ramp.num, y= pcb.100hz, color = Trial)) +
-    geom_point()+
-  geom_line()+
-  geom_smooth(method ="lm", se=FALSE, color = "black", aes (group = 1))+ 
-  ggtitle("100 Hz vibrations")+
-  theme(plot.title = element_text(hjust=0.5)) +
-  scale_x_continuous("Vibration number", breaks = round(seq(min(Exp$ramp.num), max(Exp$ramp.num), by=2),1))+
-  theme(axis.text.x = element_text(angle = 45, hjust = 1))+
-  scale_y_continuous("Percent change from baseline",labels = scales::percent, breaks = round(seq(min(Exp$pcb.100hz), max(Exp$pcb.100hz), by = 0.6),1))
+#g1 = ggplot(Exp, aes(x= ramp.num, y= pcb.100hz, color = Trial)) +
+   # geom_point()+
+  #geom_line()+
+  #geom_smooth(method ="lm", se=FALSE, color = "black", aes (group = 1))+ 
+  #ggtitle("100 Hz vibrations")+
+  #theme(plot.title = element_text(hjust=0.5)) +
+ # scale_x_continuous("Vibration number", breaks = round(seq(min(Exp$ramp.num), max(Exp$ramp.num), by=2),1))+
+  #theme(axis.text.x = element_text(angle = 45, hjust = 1))+
+ # scale_y_continuous("Percent change from baseline",labels = scales::percent, breaks = round(seq(min(Exp$pcb.100hz), max(Exp$pcb.100hz), #by = 0.6),1))
 
   
 
 #use the multiplot function to combine all plots in multiplot function
 
-multiplot(a1,b1,c1,d1,e1,f1,g1, cols=3)
+multiplot(a1,b1,e1, c1,d1, cols=2)
 ```
 #creating labels for control plot 
 
